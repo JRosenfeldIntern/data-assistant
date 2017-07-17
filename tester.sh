@@ -1,2 +1,3 @@
-#!/bin/sh
-python test_CreateConfigFile.py
+#!/usr/bin/python
+
+$WORKSPACE/test_CreateConfig.py
