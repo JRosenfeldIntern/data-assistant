@@ -1,3 +1,2 @@
-#!/usr/bin/env python
-
-./test_CreateConfigFile.py
+#!/bin/sh
+python test_CreateConfigFile.py
