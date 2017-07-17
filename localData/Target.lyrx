@@ -1,0 +1,391 @@
+{
+  "type" : "CIMLayerDocument",
+  "version" : "1.4.0",
+  "build" : 7198,
+  "layers" : [
+    "CIMPATH=map/site_address_points.xml"
+  ],
+  "layerDefinitions" : [
+    {
+      "type" : "CIMFeatureLayer",
+      "name" : "Site Address Points",
+      "uRI" : "CIMPATH=map/site_address_points.xml",
+      "sourceModifiedTime" : {
+        "type" : "TimeInstant"
+      },
+      "metadataURI" : "CIMPATH=Metadata/207c0c93e67abd3d0b9998bf4128457a.xml",
+      "description" : "Site Address Points",
+      "layerElevation" : {
+        "type" : "CIMLayerElevationSurface",
+        "mapElevationID" : "{EC5BE673-380B-41AF-BC04-C7916867A9A9}"
+      },
+      "expanded" : true,
+      "layerType" : "Operational",
+      "showLegends" : true,
+      "visibility" : true,
+      "displayCacheType" : "Permanent",
+      "maxDisplayCacheAge" : 5,
+      "showPopups" : true,
+      "serviceLayerID" : -1,
+      "autoGenerateFeatureTemplates" : true,
+      "featureElevationExpression" : "0",
+      "featureTable" : {
+        "type" : "CIMFeatureTable",
+        "displayField" : "FULLNAME",
+        "editable" : true,
+        "dataConnection" : {
+          "type" : "CIMFeatureDatasetDataConnection",
+          "featureDataset" : "CommunityAddresses",
+          "workspaceConnectionString" : "DATABASE=..\\..\\..\\ArcGIS Tutorial Items\\GDBs\\CommunityDatasets.gdb",
+          "workspaceFactory" : "FileGDB",
+          "dataset" : "CommunityAddresses",
+          "datasetType" : "esriDTFeatureClass"
+        },
+        "studyAreaSpatialRel" : "esriSpatialRelUndefined",
+        "searchOrder" : "esriSearchOrderSpatial"
+      },
+      "htmlPopupEnabled" : true,
+      "selectable" : true,
+      "featureCacheType" : "None",
+      "enableDisplayFilters" : true,
+      "labelClasses" : [
+        {
+          "type" : "CIMLabelClass",
+          "expression" : "$feature.FULLNAME",
+          "expressionEngine" : "Arcade",
+          "featuresToLabel" : "AllVisibleFeatures",
+          "maplexLabelPlacementProperties" : {
+            "type" : "CIMMaplexLabelPlacementProperties",
+            "featureType" : "Point",
+            "avoidPolygonHoles" : true,
+            "canOverrunFeature" : true,
+            "canPlaceLabelOutsidePolygon" : true,
+            "canRemoveOverlappingLabel" : true,
+            "canStackLabel" : true,
+            "connectionType" : "Unambiguous",
+            "constrainOffset" : "NoConstraint",
+            "contourAlignmentType" : "Page",
+            "contourLadderType" : "Straight",
+            "contourMaximumAngle" : 90,
+            "enableConnection" : true,
+            "enablePointPlacementPriorities" : true,
+            "featureWeight" : 0,
+            "fontHeightReductionLimit" : 4,
+            "fontHeightReductionStep" : 0.5,
+            "fontWidthReductionLimit" : 90,
+            "fontWidthReductionStep" : 5,
+            "graticuleAlignmentType" : "Straight",
+            "keyNumberGroupName" : "Default",
+            "labelBuffer" : 15,
+            "labelLargestPolygon" : true,
+            "labelPriority" : -1,
+            "labelStackingProperties" : {
+              "type" : "CIMMaplexLabelStackingProperties",
+              "stackAlignment" : "ChooseBest",
+              "maximumNumberOfLines" : 3,
+              "minimumNumberOfCharsPerLine" : 3,
+              "maximumNumberOfCharsPerLine" : 24,
+              "separators" : [
+                {
+                  "type" : "CIMMaplexStackingSeparator",
+                  "separator" : " ",
+                  "splitAfter" : true
+                },
+                {
+                  "type" : "CIMMaplexStackingSeparator",
+                  "separator" : ",",
+                  "visible" : true,
+                  "splitAfter" : true
+                }
+              ]
+            },
+            "lineFeatureType" : "General",
+            "linePlacementMethod" : "OffsetCurvedFromLine",
+            "maximumLabelOverrun" : 36,
+            "maximumLabelOverrunUnit" : "Point",
+            "minimumFeatureSizeUnit" : "Map",
+            "multiPartOption" : "OneLabelPerPart",
+            "offsetAlongLineProperties" : {
+              "type" : "CIMMaplexOffsetAlongLineProperties",
+              "placementMethod" : "BestPositionAlongLine",
+              "labelAnchorPoint" : "CenterOfLabel",
+              "distanceUnit" : "Percentage",
+              "useLineDirection" : true
+            },
+            "pointExternalZonePriorities" : {
+              "type" : "CIMMaplexExternalZonePriorities",
+              "aboveLeft" : 4,
+              "aboveCenter" : 2,
+              "aboveRight" : 1,
+              "centerRight" : 3,
+              "belowRight" : 5,
+              "belowCenter" : 7,
+              "belowLeft" : 8,
+              "centerLeft" : 6
+            },
+            "pointPlacementMethod" : "AroundPoint",
+            "polygonAnchorPointType" : "GeometricCenter",
+            "polygonBoundaryWeight" : 0,
+            "polygonExternalZones" : {
+              "type" : "CIMMaplexExternalZonePriorities",
+              "aboveLeft" : 4,
+              "aboveCenter" : 2,
+              "aboveRight" : 1,
+              "centerRight" : 3,
+              "belowRight" : 5,
+              "belowCenter" : 7,
+              "belowLeft" : 8,
+              "centerLeft" : 6
+            },
+            "polygonFeatureType" : "General",
+            "polygonInternalZones" : {
+              "type" : "CIMMaplexInternalZonePriorities",
+              "center" : 1
+            },
+            "polygonPlacementMethod" : "CurvedInPolygon",
+            "primaryOffset" : 1,
+            "primaryOffsetUnit" : "Point",
+            "removeExtraWhiteSpace" : true,
+            "repetitionIntervalUnit" : "Map",
+            "rotationProperties" : {
+              "type" : "CIMMaplexRotationProperties",
+              "rotationType" : "Arithmetic",
+              "alignmentType" : "Straight"
+            },
+            "secondaryOffset" : 100,
+            "strategyPriorities" : {
+              "type" : "CIMMaplexStrategyPriorities",
+              "stacking" : 1,
+              "overrun" : 2,
+              "fontCompression" : 3,
+              "fontReduction" : 4,
+              "abbreviation" : 5
+            },
+            "thinningDistanceUnit" : "Point",
+            "truncationMarkerCharacter" : ".",
+            "truncationMinimumLength" : 1,
+            "truncationPreferredCharacters" : "aeiou"
+          },
+          "name" : "Class 1",
+          "priority" : -1,
+          "standardLabelPlacementProperties" : {
+            "type" : "CIMStandardLabelPlacementProperties",
+            "featureType" : "Line",
+            "featureWeight" : "Low",
+            "labelWeight" : "High",
+            "numLabelsOption" : "OneLabelPerName",
+            "lineLabelPosition" : {
+              "type" : "CIMStandardLineLabelPosition",
+              "above" : true,
+              "inLine" : true,
+              "parallel" : true
+            },
+            "lineLabelPriorities" : {
+              "type" : "CIMStandardLineLabelPriorities",
+              "aboveStart" : 3,
+              "aboveAlong" : 3,
+              "aboveEnd" : 3,
+              "centerStart" : 3,
+              "centerAlong" : 3,
+              "centerEnd" : 3,
+              "belowStart" : 3,
+              "belowAlong" : 3,
+              "belowEnd" : 3
+            },
+            "pointPlacementMethod" : "AroundPoint",
+            "pointPlacementPriorities" : {
+              "type" : "CIMStandardPointPlacementPriorities",
+              "aboveLeft" : 2,
+              "aboveCenter" : 2,
+              "aboveRight" : 1,
+              "centerLeft" : 3,
+              "centerRight" : 2,
+              "belowLeft" : 3,
+              "belowCenter" : 3,
+              "belowRight" : 2
+            },
+            "rotationType" : "Arithmetic",
+            "polygonPlacementMethod" : "AlwaysHorizontal"
+          },
+          "textSymbol" : {
+            "type" : "CIMSymbolReference",
+            "symbol" : {
+              "type" : "CIMTextSymbol",
+              "blockProgression" : "TTB",
+              "depth3D" : 1,
+              "extrapolateBaselines" : true,
+              "fontEffects" : "Normal",
+              "fontEncoding" : "Unicode",
+              "fontFamilyName" : "Tahoma",
+              "fontStyleName" : "Regular",
+              "fontType" : "Unspecified",
+              "haloSize" : 1,
+              "height" : 10,
+              "hinting" : "Default",
+              "horizontalAlignment" : "Left",
+              "kerning" : true,
+              "letterWidth" : 100,
+              "ligatures" : true,
+              "lineGapType" : "ExtraLeading",
+              "symbol" : {
+                "type" : "CIMPolygonSymbol",
+                "symbolLayers" : [
+                  {
+                    "type" : "CIMSolidFill",
+                    "enable" : true,
+                    "color" : {
+                      "type" : "CIMRGBColor",
+                      "values" : [
+                        0,
+                        0,
+                        0,
+                        100
+                      ]
+                    }
+                  }
+                ]
+              },
+              "textCase" : "Normal",
+              "textDirection" : "LTR",
+              "verticalAlignment" : "Bottom",
+              "verticalGlyphOrientation" : "Right",
+              "wordSpacing" : 100,
+              "billboardMode3D" : "FaceNearPlane"
+            }
+          },
+          "useCodedValue" : true,
+          "visibility" : true,
+          "iD" : -1
+        }
+      ],
+      "renderer" : {
+        "type" : "CIMSimpleRenderer",
+        "patch" : "Default",
+        "symbol" : {
+          "type" : "CIMSymbolReference",
+          "symbol" : {
+            "type" : "CIMPointSymbol",
+            "symbolLayers" : [
+              {
+                "type" : "CIMVectorMarker",
+                "enable" : true,
+                "anchorPointUnits" : "Relative",
+                "dominantSizeAxis3D" : "Y",
+                "size" : 6,
+                "billboardMode3D" : "FaceNearPlane",
+                "frame" : {
+                  "xmin" : -5,
+                  "ymin" : -5,
+                  "xmax" : 5,
+                  "ymax" : 5
+                },
+                "markerGraphics" : [
+                  {
+                    "type" : "CIMMarkerGraphic",
+                    "geometry" : {
+                      "curveRings" : [
+                        [
+                          [
+                            0,
+                            5
+                          ],
+                          {
+                            "a" : [
+                              [
+                                0,
+                                5
+                              ],
+                              [
+                                0,
+                                0
+                              ],
+                              0,
+                              1
+                            ]
+                          },
+                          [
+                            0,
+                            5
+                          ]
+                        ]
+                      ]
+                    },
+                    "symbol" : {
+                      "type" : "CIMPolygonSymbol",
+                      "symbolLayers" : [
+                        {
+                          "type" : "CIMSolidStroke",
+                          "enable" : true,
+                          "capStyle" : "Round",
+                          "joinStyle" : "Round",
+                          "lineStyle3D" : "Strip",
+                          "miterLimit" : 10,
+                          "width" : 0.75,
+                          "color" : {
+                            "type" : "CIMRGBColor",
+                            "values" : [
+                              255,
+                              255,
+                              255,
+                              100
+                            ]
+                          }
+                        },
+                        {
+                          "type" : "CIMSolidFill",
+                          "enable" : true,
+                          "color" : {
+                            "type" : "CIMRGBColor",
+                            "values" : [
+                              232.05058288574219,
+                              174.03890991210938,
+                              230.11672973632813,
+                              100
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "scaleSymbolsProportionally" : true,
+                "respectFrame" : true
+              }
+            ],
+            "haloSize" : 1,
+            "scaleX" : 1,
+            "angleAlignment" : "Display"
+          }
+        }
+      },
+      "scaleSymbols" : true,
+      "snappable" : true
+    }
+  ],
+  "binaryReferences" : [
+    {
+      "type" : "CIMBinaryReference",
+      "uRI" : "CIMPATH=Metadata/207c0c93e67abd3d0b9998bf4128457a.xml",
+      "data" : "<metadata xml:lang=\"en\"><Esri><SyncOnce>TRUE</SyncOnce><ArcGISFormat>1.0</ArcGISFormat><CreaDate>20160407</CreaDate><CreaTime>08070200</CreaTime><DataProperties><itemProps><itemLocation><linkage Sync=\"TRUE\">file://\\\\LINDSAY-8\\C$\\Solutions_Apps\\ForRelease\\May2016\\FixingCommunityAddresses\\Shipped\\CommunityAddresses\\CommunityAddresses\\MapsandGeodatabase\\CommunityDatasets.gdb</linkage><protocol Sync=\"TRUE\">Local Area Network</protocol></itemLocation></itemProps></DataProperties></Esri><idinfo><descript><abstract>Site address points represent the location of site or service delivery addresses assigned by local governments and aggregated for community use.</abstract><purpose>Site Address Points</purpose></descript><keywords><theme><themekt>X-Ray</themekt><themekey></themekey></theme></keywords><accconst></accconst><useconst></useconst><status><progress></progress><update></update></status><spdom><bounding><westbc>NaN</westbc><eastbc>NaN</eastbc><northbc>NaN</northbc><southbc>NaN</southbc></bounding></spdom></idinfo><eainfo><detailed Name=\"\"><attr><attrlabl Sync=\"TRUE\">OBJECTID</attrlabl><attalias Sync=\"TRUE\">OBJECTID</attalias><attrtype Sync=\"TRUE\">OID</attrtype><attwidth Sync=\"TRUE\">4</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Internal feature number.</attrdef><attrdefs Sync=\"TRUE\">Esri</attrdefs><attrdomv><udom Sync=\"TRUE\">Sequential unique whole numbers that are automatically generated.</udom></attrdomv></attr><attr><attrlabl Sync=\"TRUE\">SHAPE</attrlabl><attalias Sync=\"TRUE\">SHAPE</attalias><attrtype Sync=\"TRUE\">Geometry</attrtype><attwidth Sync=\"TRUE\">0</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Feature geometry.</attrdef><attrdefs Sync=\"TRUE\">Esri</attrdefs><attrdomv><udom Sync=\"TRUE\">Coordinates defining the features.</udom></attrdomv></attr><attr><attrlabl Sync=\"TRUE\">ADDRCLASS</attrlabl><attalias Sync=\"TRUE\">Description</attalias><attrtype Sync=\"TRUE\">Integer</attrtype><attwidth Sync=\"TRUE\">4</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">A general classification (ex. land use, structure type) of how the structure or location represented by the site address point</attrdef></attr><attr><attrlabl Sync=\"TRUE\">ADDRNUM</attrlabl><attalias Sync=\"TRUE\">Full Address Number</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">20</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The full address number</attrdef></attr><attr><attrlabl Sync=\"TRUE\">ADDRNUMSUF</attrlabl><attalias Sync=\"TRUE\">Address Number Suffix</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">5</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The address number suffix</attrdef></attr><attr><attrlabl Sync=\"TRUE\">ADDRRANGE</attrlabl><attalias Sync=\"TRUE\">Address Range</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">50</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Address range when a point describes a set of addresses</attrdef></attr><attr><attrlabl Sync=\"TRUE\">ALTUNITID</attrlabl><attalias Sync=\"TRUE\">Alternate Address Unit Number</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">10</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The alternate or secondary address unit designation</attrdef></attr><attr><attrlabl Sync=\"TRUE\">ALTUNITTYPE</attrlabl><attalias Sync=\"TRUE\">Alternate Address Unit Type</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">10</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The alternate or secondary address unit type</attrdef></attr><attr><attrlabl Sync=\"TRUE\">CAPTUREMETH</attrlabl><attalias Sync=\"TRUE\">Capture Method</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">30</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Capture method (ex. geocoded, GPS, site visit, placed on map) for address point</attrdef></attr><attr><attrlabl Sync=\"TRUE\">FULLADDR</attrlabl><attalias Sync=\"TRUE\">Full Address</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">250</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Address information combined into one text field. In your community, this may include the following fields: PREADDRNUM, ADDRNUM, ADDRNUMSUF, FULLNAME, UNITTYPE, UNITID, ALTUNITTYPE, and ALTUNITID.</attrdef></attr><attr><attrlabl Sync=\"TRUE\">FULLNAME</attrlabl><attalias Sync=\"TRUE\">Full Road Name</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">125</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The full name of the road including any prefix and/or suffix in mixed case format for Esri Community Map contributors</attrdef></attr><attr><attrlabl Sync=\"TRUE\">LASTEDITOR</attrlabl><attalias Sync=\"TRUE\">Last Editor</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">50</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The user who performed the last update</attrdef></attr><attr><attrlabl Sync=\"TRUE\">LASTUPDATE</attrlabl><attalias Sync=\"TRUE\">Last Update Date</attalias><attrtype Sync=\"TRUE\">Date</attrtype><attwidth Sync=\"TRUE\">8</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The date the feature was last updated</attrdef></attr><attr><attrlabl Sync=\"TRUE\">LOCALFIPS</attrlabl><attalias Sync=\"TRUE\">Local FIPS</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">50</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The local FIPS code assigned by the Census Bureau</attrdef></attr><attr><attrlabl Sync=\"TRUE\">MUNICIPALITY</attrlabl><attalias Sync=\"TRUE\">Municipality Name</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">250</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The name of the physical municipality the site address resides in</attrdef></attr><attr><attrlabl Sync=\"TRUE\">PLACENAME</attrlabl><attalias Sync=\"TRUE\">Place Name</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">250</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">A common name or vanity address for the site or service delivery address</attrdef></attr><attr><attrlabl Sync=\"TRUE\">POINTTYPE</attrlabl><attalias Sync=\"TRUE\">Location</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">30</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">A general description (ex. building, parcel, unit, condo, asset) of the physical location represented by the site address point</attrdef></attr><attr><attrlabl Sync=\"TRUE\">PREADDRNUM</attrlabl><attalias Sync=\"TRUE\">Address Number Prefix</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">5</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The address number prefix</attrdef></attr><attr><attrlabl Sync=\"TRUE\">SITEADDID</attrlabl><attalias Sync=\"TRUE\">Site Address ID</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">250</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">Locally assigned site address point identifier</attrdef></attr><attr><attrlabl Sync=\"TRUE\">STCOFIPS</attrlabl><attalias Sync=\"TRUE\">State FIPS</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">50</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The state county FIPS code assigned by the Census Bureau</attrdef></attr><attr><attrlabl Sync=\"TRUE\">UNITID</attrlabl><attalias Sync=\"TRUE\">Address Unit Number</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">10</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The address unit designation</attrdef></attr><attr><attrlabl Sync=\"TRUE\">UNITTYPE</attrlabl><attalias Sync=\"TRUE\">Address Unit Type</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">10</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The address unit type</attrdef></attr><attr><attrlabl Sync=\"TRUE\">USNGCOORD</attrlabl><attalias Sync=\"TRUE\">USNG Coordinate</attalias><attrtype Sync=\"TRUE\">String</attrtype><attwidth Sync=\"TRUE\">50</attwidth><atprecis Sync=\"TRUE\">0</atprecis><attscale Sync=\"TRUE\">0</attscale><attrdef Sync=\"TRUE\">The USNG coordinate value</attrdef></attr></detailed></eainfo></metadata>\r\n"
+    }
+  ],
+  "elevationSurfaces" : [
+    {
+      "type" : "CIMMapElevationSurface",
+      "elevationMode" : "BaseGlobeSurface",
+      "name" : "Ground",
+      "verticalExaggeration" : 1,
+      "mapElevationID" : "{EC5BE673-380B-41AF-BC04-C7916867A9A9}",
+      "color" : {
+        "type" : "CIMRGBColor",
+        "values" : [
+          255,
+          255,
+          255,
+          100
+        ]
+      },
+      "surfaceTINShadingMode" : "Smooth"
+    }
+  ]
+}
