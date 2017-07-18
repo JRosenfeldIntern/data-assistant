@@ -2,7 +2,7 @@ import unittest
 import os, sys
 import arcpy
 import pathlib
-from inc_datasources import _daGPTools, _dbConnStr,  _configMatrix, _validConfigFiles, _invalidConfigFiles, \
+from inc_datasources import _daGPTools, _dbConnStr, _configMatrix, _validConfigFiles, _invalidConfigFiles, \
 	_localOutputPath, _localWorkspace, _outputDirectory
 
 sys.path.insert(0, _daGPTools)
@@ -27,9 +27,9 @@ class TestReplace(unittest.TestCase):
 
 	def make_copy(self):
 		directory = _outputDirectory
-		dlaTesterFunctions.clearFeatureClasses(directory) # creating a copy of the target feature class
-		arcpy.env.workspace = localWorkspace["Target"] # to compare to after append
-		arcpy.CopyFeatures_management("Target",os.path.join(directory,"copy"))
+		dlaTesterFunctions.clearFeatureClasses(directory)  # creating a copy of the target feature class
+		arcpy.env.workspace = localWorkspace["Target"]  # to compare to after append
+		arcpy.CopyFeatures_management("Target", os.path.join(directory, "copy"))
 
 	def test_replace(self):
 		self.make_copy()
@@ -38,7 +38,7 @@ class TestReplace(unittest.TestCase):
 
 	def testFields(self):
 		directory = _outputDirectory
-		dlaTesterFunctions.test_fields(self,directory,localWorkspace,xmlLocation)
+		dlaTesterFunctions.test_fields(self, directory, localWorkspace, xmlLocation)
 
 	def testData(self):
 		sourceFCPath = localWorkspace["Source"]
@@ -47,8 +47,7 @@ class TestReplace(unittest.TestCase):
 		for fc in arcpy.ListFeatureClasses():
 			if fc == "source":
 				sourceFeatureClass = fc
-		sourceDataPath = os.path.join(sourceFCPath,sourceFeatureClass)
-
+		sourceDataPath = os.path.join(sourceFCPath, sourceFeatureClass)
 
 		targetFCPath = localWorkspace["Target"]
 		arcpy.env.workspace = targetFCPath
@@ -57,37 +56,37 @@ class TestReplace(unittest.TestCase):
 			if fc == "Target":
 				targetFeatureClass = fc
 
-
-		fields = [dla.getNodeValue(field,"TargetName") for field in dla.getXmlElements(_configMatrix[0]["xmlLocation"],"Field")]
+		fields = [dla.getNodeValue(field, "TargetName") for field in
+		          dla.getXmlElements(_configMatrix[0]["xmlLocation"], "Field")]
 		try:
-			fields.remove("GLOBALID") #TODO: remove or fix. very conditional to the specific data set
+			fields.remove("GLOBALID")  # TODO: remove or fix. very conditional to the specific data set
 		except:
 			None
-		targetDataPath = os.path.join(targetFCPath,targetFeatureClass)
-		targetCursor = dlaTesterFunctions.build_table(targetFCPath,targetFeatureClass)
+		targetDataPath = os.path.join(targetFCPath, targetFeatureClass)
+		targetCursor = dlaTesterFunctions.build_table(targetFCPath, targetFeatureClass)
 
 		directory = _outputDirectory
-		copyDataPath = os.path.join(directory,"copy")
+		copyDataPath = os.path.join(directory, "copy")
 
-		targetCursor = [row for row in arcpy.da.SearchCursor(targetDataPath,fields)]
-		copyCursor = [row for row in arcpy.da.SearchCursor(copyDataPath,fields)]
+		targetCursor = [row for row in arcpy.da.SearchCursor(targetDataPath, fields)]
+		copyCursor = [row for row in arcpy.da.SearchCursor(copyDataPath, fields)]
 
-		for origin,copy in zip(targetCursor,copyCursor):
-			self.assertEqual(origin,copy)
+		for origin, copy in zip(targetCursor, copyCursor):
+			self.assertEqual(origin, copy)
 
-		dlaTesterFunctions.test_data(self, sourceDataPath , targetDataPath, xmlLocation,len(copyCursor), True)
-
+		dlaTesterFunctions.test_data(self, sourceDataPath, targetDataPath, xmlLocation, len(copyCursor), True)
 
 	def testLength(self):
-		dlaTesterFunctions.test_length(tester=self, mode="Replace", localWorkspace = localWorkspace)
+		dlaTesterFunctions.test_length(tester=self, mode="Replace", localWorkspace=localWorkspace)
 
-
-	def run_test(self,testCase,lw):
+	def run_test(self, testCase, lw):
 		suite = unittest.TestSuite()
 		runner = unittest.TextTestRunner()
 
-		self.xmlLocation = testCase["xmlLocation"]
-		self.localWorkspace = lw
+		global xmlLocation
+		xmlLocation = testCase["xmlLocation"]
+		global localWorkspace
+		localWorkspace = lw
 
 		suite.addTest(TestReplace("test_replace"))
 		suite.addTest(TestReplace("testData"))
@@ -104,4 +103,4 @@ class TestReplace(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	TestReplace.run_test(_configMatrix[0],_localWorkspace[0])
+	TestReplace.run_test(_configMatrix[0], _localWorkspace[0])

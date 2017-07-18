@@ -1,6 +1,8 @@
 import unittest
 import os, sys
 import arcpy
+import filecmp
+import shutil
 import pathlib
 from inc_datasources import _daGPTools, _dbConnStr, _configMatrix, _validConfigFiles, \
 	_invalidConfigFiles, _localOutputPath, _localWorkspace
@@ -42,6 +44,7 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 	cleanup = True
 	xmlLocation = ""
 	localWorkspace = dict()
+	testCase = dict()
 
 	def setUp(self):
 		# self.assertTrue(arcpy.Exists(_dbConnStr[0]["sdePath"]))
@@ -57,16 +60,28 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 	def test_CreateConfig(self):
 		sourcePath = dla.getLayerPath(os.path.join(localWorkspace["Source"],localWorkspace["SourceName"]))
 		targetPath = dla.getLayerPath(os.path.join(localWorkspace["Target"],localWorkspace["TargetName"]))
+		fieldMatcher = os.path.dirname(os.path.realpath(__file__))
+		shutil.copy(testCase["MatchLibrary"],fieldMatcher)
 		self.assertTrue(dlaCreateSourceTarget.createDlaFile(sourcePath, targetPath, xmlLocation))
 
-	def run_test(self, testCase,lw):
+	# a bit hacky but might work. Ensures the created XML file is exactly equal to a pre-created XML file
+	# if fields are off or in a different order, it fails. This, however, shouldn't happen
+	# a better solution might be found here:
+	# https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
+	def test_XML(self):
+		self.assertTrue(filecmp.cmp(testCase["outXML"],testCase["correctXML"]))
+
+	def run_test(self, tc,lw):
 		suite = unittest.TestSuite()
 		runner = unittest.TextTestRunner()
+		global testCase
+		testCase = tc
 		global xmlLocation
-		xmlLocation = testCase["xmlLocation"]
+		xmlLocation = tc["outXML"]
 		global localWorkspace
 		localWorkspace = lw
 		suite.addTest(TestCreateConfigWorkflows("test_CreateConfig"))
+		suite.addTest(TestCreateConfigWorkflows("test_XML"))
 		results = runner.run(suite)
 
 		# check the test and if there are failures, write to disk

@@ -51,11 +51,7 @@ class TestPreview(unittest.TestCase):
 	def testLength(self): #Testing multiple lengths would require recreating the preview file. Should that be done?
 		sourceFCPath = localWorkspace["Source"]
 		sourceCursor = dlaTesterFunctions.build_table(sourceFCPath,localWorkspace["SourceName"])
-		count = 0
-		for row in sourceCursor:
-			count += 1
-			if count > self.rowLim:
-				break
+		count = len(sourceCursor)
 		if count < self.rowLim:
 			dlaTesterFunctions.test_length(tester = self, mode = "Preview",localWorkspace = localWorkspace ,rowLimit = count)
 		else:
