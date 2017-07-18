@@ -3,7 +3,7 @@ import os, sys
 import arcpy
 import pathlib
 from inc_datasources import _daGPTools, _dbConnStr,  _configMatrix, _validConfigFiles, _invalidConfigFiles, \
-	_localOutputPath, _localWorkspace
+	_localOutputPath, _localWorkspace, _outputDirectory
 
 sys.path.insert(0, _daGPTools)
 import dla, dlaStage, dlaCreateSourceTarget, dlaTesterFunctions, dlaPublish
@@ -11,6 +11,8 @@ import dla, dlaStage, dlaCreateSourceTarget, dlaTesterFunctions, dlaPublish
 
 class TestAppend(unittest.TestCase):
 	cleanup = True
+	localWorkspace = []
+	xmlLocation = ""
 
 	def setUp(self):
 		# self.assertTrue(arcpy.Exists(_dbConnStr[0]["sdePath"]))
@@ -24,7 +26,7 @@ class TestAppend(unittest.TestCase):
 		pass
 
 	def make_copy(self):
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		dlaTesterFunctions.clearFeatureClasses(directory) # creating a copy of the target feature class
 		arcpy.env.workspace = localWorkspace["Target"] # to compare to after append
 		arcpy.CopyFeatures_management("Target",os.path.join(directory,"copy"))
@@ -35,12 +37,10 @@ class TestAppend(unittest.TestCase):
 		self.assertIsNone(dlaPublish.publish(xmlLocation))
 
 	def testFields(self):
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		dlaTesterFunctions.test_fields(self,directory,localWorkspace,xmlLocation)
 
 	def testData(self):
-
-
 		sourceFCPath = localWorkspace["Source"]
 		arcpy.env.workspace = sourceFCPath
 		sourceFeatureClass = ""
@@ -66,7 +66,7 @@ class TestAppend(unittest.TestCase):
 		targetDataPath = os.path.join(targetFCPath,targetFeatureClass)
 		targetCursor = dlaTesterFunctions.build_table(targetFCPath,targetFeatureClass)
 
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		copyDataPath = os.path.join(directory,"copy")
 
 		targetCursor = [row for row in arcpy.da.SearchCursor(targetDataPath,fields)]
@@ -81,23 +81,31 @@ class TestAppend(unittest.TestCase):
 	def testLength(self):
 		dlaTesterFunctions.test_length(tester=self, mode="Append", localWorkspace = localWorkspace)
 
+	def run_test(self,testCase,lw):
+		suite = unittest.TestSuite()
+		runner = unittest.TextTestRunner()
 
-if __name__ == '__main__':
-	suite = unittest.TestSuite()
-	suite.addTest(TestAppend("test_append"))
-	suite.addTest(TestAppend("testData"))
-	suite.addTest(TestAppend("testLength"))
-	suite.addTest(TestAppend("testFields"))
-	runner = unittest.TextTestRunner()
-
-	for testCase,lw in zip(_configMatrix,_localWorkspace):
+		global xmlLocation
 		xmlLocation = testCase["xmlLocation"]
+		global localWorkspace
 		localWorkspace = lw
+		suite.addTest(TestAppend("test_append"))
+		suite.addTest(TestAppend("testData"))
+		suite.addTest(TestAppend("testLength"))
+		suite.addTest(TestAppend("testFields"))
+
+		directory = _outputDirectory
+		copyDataPath = os.path.join(directory, "copy")
+		targetDataPath = os.path.join(localWorkspace["Target"], localWorkspace["TargetName"])
+		dlaTesterFunctions.restoreFeatureClass(copyDataPath, targetDataPath)
 		results = runner.run(suite)
-	# check the test and if there are failures, write to disk
-	if len(results.failures) > 0:
-		for fail in results.failures:
-			with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
-				print(fail, file=text_file)
-	else:
-		print("No failures")
+
+		# check the test and if there are failures, write to disk
+		if len(results.failures) > 0:
+			for fail in results.failures:
+				with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
+					print(fail, file=text_file)
+		else:
+			print("No failures")
+if __name__ == '__main__':
+	TestAppend.run_test(_configMatrix[0],_localWorkspace[0])

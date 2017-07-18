@@ -3,17 +3,18 @@ import os,sys,pathlib
 # Path to Data Assistant tools
 _daGPTools = r"C:\Users\Win10\AppData\Local\ESRI\ArcGISPro\AssemblyCache\{28142961-b645-420f-ba2a-72bcf8212558}\GPTools\arcpy"
 # location for local output
-_localOutputPath = os.path.join(str(pathlib.Path(__file__).parents[0]),'testOutput')
+_localOutputPath = str(pathlib.Path(__file__).parents[0]/'testOutput')
+_outputDirectory = str(pathlib.Path(__file__).parents[0]/'dla.gdb')
 
 ########### Source and Target ##########
 # DB Workspaces
 _localWorkspace = []
-_localWorkspace.append({"Source":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb",
-                        "Target": r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb",
-                        "SourceName":"source",
-                        "TargetName":"Target"})
-_localWorkspace.append({"Source":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData",
-                       "Target":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData",
+#_localWorkspace.append({"Source":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb",
+#                        "Target": r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb",
+#                        "SourceName":"source",
+#                        "TargetName":"Target"})
+_localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
+                       "Target":str(pathlib.Path(".\localData").absolute()),
                         "SourceName":"source.lyrx",
                         "TargetName":"Target.lyrx"})
 
@@ -21,25 +22,25 @@ _localWorkspace.append({"Source":r"C:\Users\josh9173\Documents\DataAssistantTest
 # DB Connection
 _dbConnStr = []
 _dbConnStr.append({"title":"GDB Source",
-                   "dataPath":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb\source"})
+                   "dataPath":str(pathlib.Path(".\localData\WaterDataMigration.gdb\source").absolute())})
 _dbConnStr.append({"title":"GDB Target",
-                   "dataPath":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\WaterDataMigration.gdb\Target"})
+                   "dataPath":str(pathlib.Path(".\localData\WaterDataMigration.gdb\Target").absolute())})
 
 _dbConnStr.append({"title":"Layer Source",
-                   "dataPath":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\source.lyrx"})
+                   "dataPath":str(pathlib.Path(".\localData\source.lyrx").absolute())})
 _dbConnStr.append({"title":"Layer Target",
-                   "dataPath":r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\localData\Target.lyrx"})
+                   "dataPath":str(pathlib.Path(".\localData\Target.lyrx").absolute())})
 
 
 ########### Source and Target Matrix ##########
 _configMatrix=[]
-_configMatrix.append({"Source":_dbConnStr[0],
-                      "Target":_dbConnStr[1],
-                      "xmlLocation":os.path.join(_localOutputPath,"GDB_to_GDB.xml"),
-                      "case":"EGDB to EDGB"})
-#_configMatrix.append({"Source":_dbConnStr[2],
-#                      "Target":_dbConnStr[3],
-#                      "xmlLocation":os.path.join(_localOutputPath,"lyrx_to_lyrx.xml")})
+#_configMatrix.append({"Source":_dbConnStr[0],
+#                     "Target":_dbConnStr[1],
+#                      "xmlLocation":os.path.join(_localOutputPath,"GDB_to_GDB.xml"),
+#                      "case":"EGDB to EDGB"})
+_configMatrix.append({"Source":_dbConnStr[2],
+                      "Target":_dbConnStr[3],
+                      "xmlLocation":os.path.join(_localOutputPath,"lyrx_to_lyrx.xml")})
 
 ########### Additional Config Files ##########
 # Valid Configuration Files
@@ -68,5 +69,3 @@ _XMLMethodNames = {"None":"None",
             "Split":"Split",
             "Conditional Value":"ConditionalValue",
             "Domain Map":"DomainMap"}
-
-

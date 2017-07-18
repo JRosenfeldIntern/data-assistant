@@ -3,7 +3,7 @@ import os, sys
 import arcpy
 import pathlib
 from inc_datasources import _daGPTools, _dbConnStr, _configMatrix, _validConfigFiles, \
-	_invalidConfigFiles, _localOutputPath
+	_invalidConfigFiles, _localOutputPath, _localWorkspace
 
 sys.path.insert(0, _daGPTools)
 import dlaCreateSourceTarget, dla, dlaStage
@@ -40,6 +40,8 @@ def importUtilNetworkToolbox():
 
 class TestCreateConfigWorkflows(unittest.TestCase):
 	cleanup = True
+	xmlLocation = ""
+	localWorkspace = dict()
 
 	def setUp(self):
 		# self.assertTrue(arcpy.Exists(_dbConnStr[0]["sdePath"]))
@@ -53,24 +55,28 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 		pass
 
 	def test_CreateConfig(self):
-		sourcePath = dla.getLayerPath(testCase["Source"]["dataPath"])
-		targetPath = dla.getLayerPath(testCase["Target"]["dataPath"])
+		sourcePath = dla.getLayerPath(os.path.join(localWorkspace["Source"],localWorkspace["SourceName"]))
+		targetPath = dla.getLayerPath(os.path.join(localWorkspace["Target"],localWorkspace["TargetName"]))
 		self.assertTrue(dlaCreateSourceTarget.createDlaFile(sourcePath, targetPath, xmlLocation))
+
+	def run_test(self, testCase,lw):
+		suite = unittest.TestSuite()
+		runner = unittest.TextTestRunner()
+		global xmlLocation
+		xmlLocation = testCase["xmlLocation"]
+		global localWorkspace
+		localWorkspace = lw
+		suite.addTest(TestCreateConfigWorkflows("test_CreateConfig"))
+		results = runner.run(suite)
+
+		# check the test and if there are failures, write to disk
+		if len(results.failures) > 0:
+			for fail in results.failures:
+				with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
+					print(fail, file=text_file)
+		else:
+			print("No failures")
 
 
 if __name__ == '__main__':
-	# suite = unittest.TestSuite()
-	suite = unittest.TestSuite()
-	#runner = unittest.TextTestRunner()
-	runner = unittest.TextTestRunner()
-	for testCase in _configMatrix:
-		xmlLocation = testCase["xmlLocation"]
-		suite.addTest(TestCreateConfigWorkflows("test_CreateConfig"))
-	results = runner.run(suite)
-# check the test and if there are failures, write to disk
-if len(results.failures) > 0:
-	for fail in results.failures:
-		with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
-			print(fail, file=text_file)
-else:
-	print("No failures")
+	TestCreateConfigWorkflows.run_test(_configMatrix[0],_localWorkspace[1])

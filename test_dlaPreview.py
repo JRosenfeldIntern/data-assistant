@@ -2,7 +2,8 @@ import unittest
 import os, sys
 import arcpy
 import pathlib
-from inc_datasources import _daGPTools, _dbConnStr,_configMatrix, _validConfigFiles,_invalidConfigFiles, _localOutputPath, _localWorkspace
+from inc_datasources import _daGPTools, _dbConnStr,_configMatrix, _validConfigFiles,_invalidConfigFiles, _localOutputPath\
+	, _localWorkspace, _outputDirectory
 
 sys.path.insert(0, _daGPTools)
 import dla, dlaPreview, dlaCreateSourceTarget, dlaFieldCalculator, dlaTesterFunctions
@@ -11,6 +12,8 @@ import dla, dlaPreview, dlaCreateSourceTarget, dlaFieldCalculator, dlaTesterFunc
 class TestPreview(unittest.TestCase):
 	cleanup = True
 	rowLim = 200
+	localWorkspace = []
+	xmlLocation = ""
 
 	def setUp(self):
 		# self.assertTrue(arcpy.Exists(_dbConnStr[0]["sdePath"]))
@@ -24,21 +27,21 @@ class TestPreview(unittest.TestCase):
 		pass
 
 	def test_preview(self):
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		arcpy.env.workspace = directory
 		dlaTesterFunctions.clearFeatureClasses(directory)
 		dlaPreview.rowLimit = self.rowLim
 		dlaPreview.preview(xmlLocation) #creates the new feature class
 
 	def testFields(self):
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		dlaTesterFunctions.test_fields(self,directory,localWorkspace,xmlLocation)
 
 	def testData(self):
 		sourceFCPath = localWorkspace["Source"]
 		sourceDataPath = os.path.join(sourceFCPath,localWorkspace["SourceName"])
 
-		directory = r"C:\Users\josh9173\Documents\DataAssistantTests\unitTest\dla.gdb"
+		directory = _outputDirectory
 		arcpy.env.workspace = directory
 		featureclass = arcpy.ListFeatureClasses()[0]
 		localDataPath = os.path.join(directory,featureclass)
@@ -58,23 +61,25 @@ class TestPreview(unittest.TestCase):
 		else:
 			dlaTesterFunctions.test_length(tester = self,mode = "Preview",localWorkspace = localWorkspace,rowLimit = self.rowLim)
 
-
-if __name__ == '__main__':
-	suite = unittest.TestSuite()
-
-	runner = unittest.TextTestRunner()
-	for testCase,lw in zip(_configMatrix,_localWorkspace):
+	def run_test(self,testCase,lw):
+		suite = unittest.TestSuite()
+		runner = unittest.TextTestRunner()
+		global xmlLocation
 		xmlLocation = testCase["xmlLocation"]
+		global localWorkspace
 		localWorkspace = lw
 		suite.addTest(TestPreview("test_preview"))
 		suite.addTest(TestPreview("testFields"))
 		suite.addTest(TestPreview("testData"))
 		suite.addTest(TestPreview("testLength"))
-	results = runner.run(suite)
-	# check the test and if there are failures, write to disk
-	if len(results.failures) > 0:
-		for fail in results.failures:
-			with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
-				print(fail, file=text_file)
-	else:
-		print("No failures")
+		results = runner.run(suite)
+		# check the test and if there are failures, write to disk
+		if len(results.failures) > 0:
+			for fail in results.failures:
+				with open(os.path.join(_localOutputPath, "Failed_ExportDataset.txt"), "w") as text_file:
+					print(fail, file=text_file)
+		else:
+			print("No failures")
+
+if __name__ == '__main__':
+	run_test(self,_configMatrix[0],_localWorkspace[0])
