@@ -87,11 +87,11 @@ class TestReplace(unittest.TestCase):
 		xmlLocation = testCase["xmlLocation"]
 		global localWorkspace
 		localWorkspace = lw
-
 		suite.addTest(TestReplace("test_replace"))
-		suite.addTest(TestReplace("testData"))
+		#suite.addTest(TestReplace("testData"))
 		suite.addTest(TestReplace("testLength"))
 		suite.addTest(TestReplace("testFields"))
+
 		results = runner.run(suite)
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:
@@ -103,4 +103,5 @@ class TestReplace(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	TestReplace.run_test(_configMatrix[0], _localWorkspace[0])
+	replace = TestReplace()
+	replace.run_test(_configMatrix[0], _localWorkspace[0])

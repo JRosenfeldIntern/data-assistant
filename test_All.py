@@ -17,5 +17,5 @@ if __name__ == '__main__':
     for testCase,lw in zip(_configMatrix,_localWorkspace):
         createConfig.run_test(testCase,lw)
         preview.run_test(testCase,lw)
-        #stage.run_test(testCase,lw)
+        stage.run_test(testCase,lw)
         #append.run_test(testCase,lw)

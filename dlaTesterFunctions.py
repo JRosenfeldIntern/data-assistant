@@ -86,6 +86,8 @@ def test_length(tester, mode, localWorkspace, rowLimit=100):
 		tester.assertEqual(len(cursor), len(sourceCursor))
 	if mode == "Append":
 		tester.assertEqual(len(targetCursor), len(cursor) + len(sourceCursor))
+	if mode == "Replace":
+		tester.assertEqual(len(targetCursor),len(cursor))
 
 
 def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, AppendCheck=False):
