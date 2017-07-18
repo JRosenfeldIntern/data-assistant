@@ -92,7 +92,8 @@ class TestReplace(unittest.TestCase):
 		suite.addTest(TestReplace("testLength"))
 		suite.addTest(TestReplace("testFields"))
 
-		results = runner.run(suite)
+		#results = runner.run(suite)
+		return suite
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:
 			for fail in results.failures:
