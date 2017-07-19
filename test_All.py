@@ -18,10 +18,11 @@ if __name__ == '__main__':
 	for testCase, lw in zip(_configMatrix, _localWorkspace):
 		suite = unittest.TestSuite()
 
-		suite.addTest(createConfig.run_test(testCase, lw))
-		suite.addTest(preview.run_test(testCase, lw))
-		suite.addTest(append.run_test(testCase, lw))
-		suite.addTest(stage.run_test(testCase, lw))
+#		suite.addTest(createConfig.run_test(testCase, lw))
+#		suite.addTest(preview.run_test(testCase, lw))
+#		suite.addTest(append.run_test(testCase, lw))
+#		suite.addTest(stage.run_test(testCase, lw))
+		suite.addTest(replace.run_test(testCase,lw))
 
 		runner = unittest.TextTestRunner()
 		runner.run(suite)

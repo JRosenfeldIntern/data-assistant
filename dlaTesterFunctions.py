@@ -89,7 +89,26 @@ def test_length(tester, mode, localWorkspace, rowLimit=100):
 	if mode == "Replace":
 		tester.assertEqual(len(targetCursor),len(cursor))
 
+# due to the nature of the ReplaceByField mutation of the attribute table, a seperate function is needed to test it
+def test_replace_data(tester, sourceDataPath, localDataPath, xmlLocation):
+	defaultValues = {}
+	fields = []
+	for field in arcpy.ListFields(localDataPath):
+		defaultValues[field.name] = field.defaultValue
+		fields.append(field.name)
 
+	sourceCursor = arcpy.da.SearchCursor(sourceDataPath,"*")
+	targetCursor = arcpy.da.SearchCursor(localDataPath,"*")
+	
+
+
+	for targetRow,sourceRow in zip(targetCursor,sourceCursor): #TODO: Implement test
+		print(targetRow)
+		print(sourceRow)
+
+
+
+# ensures the data fits what it should be according to the specified method
 def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, AppendCheck=False):
 	defaultValues = {}
 	for field in arcpy.ListFields(localDataPath):
@@ -100,7 +119,7 @@ def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, Appe
 		methods = _XMLMethodNames
 		sourcefield = dla.getNodeValue(field, "SourceName")
 		targetfield = dla.getNodeValue(field, "TargetName")
-		cursor = [row for row in arcpy.da.SearchCursor(localDataPath, targetfield)]
+		cursor = [row for row in arcpy.da.SearchCursor(localDataPath, targetfield)] #TODO: look into time complexity
 		cursor = cursor[cutoff:]  # brings the target table up to the append point if appending
 
 		if sourcefield == "(None)":  # testing for None must be done outside the main for loop

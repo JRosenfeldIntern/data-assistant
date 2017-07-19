@@ -42,39 +42,14 @@ class TestReplace(unittest.TestCase):
 
 	def testData(self):
 		sourceFCPath = localWorkspace["Source"]
-		arcpy.env.workspace = sourceFCPath
-		sourceFeatureClass = ""
-		for fc in arcpy.ListFeatureClasses():
-			if fc == "source":
-				sourceFeatureClass = fc
+		sourceFeatureClass = localWorkspace["SourceName"]
 		sourceDataPath = os.path.join(sourceFCPath, sourceFeatureClass)
 
 		targetFCPath = localWorkspace["Target"]
-		arcpy.env.workspace = targetFCPath
-		targetFeatureClass = ""
-		for fc in arcpy.ListFeatureClasses():
-			if fc == "Target":
-				targetFeatureClass = fc
-
-		fields = [dla.getNodeValue(field, "TargetName") for field in
-		          dla.getXmlElements(_configMatrix[0]["xmlLocation"], "Field")]
-		try:
-			fields.remove("GLOBALID")  # TODO: remove or fix. very conditional to the specific data set
-		except:
-			None
+		targetFeatureClass = localWorkspace["TargetName"]
 		targetDataPath = os.path.join(targetFCPath, targetFeatureClass)
-		targetCursor = dlaTesterFunctions.build_table(targetFCPath, targetFeatureClass)
 
-		directory = _outputDirectory
-		copyDataPath = os.path.join(directory, "copy")
-
-		targetCursor = [row for row in arcpy.da.SearchCursor(targetDataPath, fields)]
-		copyCursor = [row for row in arcpy.da.SearchCursor(copyDataPath, fields)]
-
-		for origin, copy in zip(targetCursor, copyCursor):
-			self.assertEqual(origin, copy)
-
-		dlaTesterFunctions.test_data(self, sourceDataPath, targetDataPath, xmlLocation, len(copyCursor), True)
+		dlaTesterFunctions.test_replace_data(self, sourceDataPath, targetDataPath, xmlLocation)
 
 	def testLength(self):
 		dlaTesterFunctions.test_length(tester=self, mode="Replace", localWorkspace=localWorkspace)
@@ -88,7 +63,7 @@ class TestReplace(unittest.TestCase):
 		global localWorkspace
 		localWorkspace = lw
 		suite.addTest(TestReplace("test_replace"))
-		#suite.addTest(TestReplace("testData"))
+		suite.addTest(TestReplace("testData"))
 		suite.addTest(TestReplace("testLength"))
 		suite.addTest(TestReplace("testFields"))
 
