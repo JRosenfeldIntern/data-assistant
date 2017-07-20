@@ -76,6 +76,8 @@ class TestAppend(unittest.TestCase):
 			self.assertEqual(origin,copy)
 
 		dlaTesterFunctions.test_data(self, sourceDataPath , targetDataPath, xmlLocation,len(copyCursor), True)
+		dlaTesterFunctions.restoreData(localWorkspace["OriginalPath"],
+		                                       os.path.join(localWorkspace["Target"],lw["TargetName"]))
 
 
 	def testLength(self):
@@ -90,9 +92,9 @@ class TestAppend(unittest.TestCase):
 		global localWorkspace
 		localWorkspace = lw
 		suite.addTest(TestAppend("test_append"))
-		suite.addTest(TestAppend("testData"))
 		suite.addTest(TestAppend("testLength"))
 		suite.addTest(TestAppend("testFields"))
+		suite.addTest(TestAppend("testData"))
 
 		directory = _outputDirectory
 		copyDataPath = os.path.join(directory, "copy")

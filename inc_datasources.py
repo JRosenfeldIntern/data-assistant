@@ -13,7 +13,8 @@ _localWorkspace.append(
 	{"Source": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
 	 "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
 	 "SourceName": "source",
-	 "TargetName": "Target"})
+	 "TargetName": "Target",
+	 "OriginalPath":str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})
 # _localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
 #                       "Target":str(pathlib.Path(".\localData").absolute()),
 #                        "SourceName":"source.lyrx",
@@ -45,25 +46,8 @@ _configMatrix.append({"Source": _dbConnStr[0],
 #                      "xmlLocation":os.path.join(_localOutputPath,"lyrx_to_lyrx.xml"),
 #                      "outXML":os.path.join(_localOutputPath,"test_lyrx.xml")})
 
-########### Additional Config Files ##########
-# Valid Configuration Files
-_validConfigFiles = []
-_validConfigFiles.append({"title": "FGDB to FGDB", "case": "Copy", "field": "all", "pathToFile": r"<files>/.xml"})
-_validConfigFiles.append({"title": "FGDB to EGDB", "case": "Copy", "field": "all", "pathToFile": r"<files>/.xml"})
-_validConfigFiles.append({"title": "EGDB to EGDB", "case": "Copy", "field": "all", "pathToFile": r"<files>/.xml"})
-_validConfigFiles.append({"title": "EGDB to FGDB", "case": "Copy", "field": "all", "pathToFile": r"<files>/.xml"})
 
-# Invalid Configuration Files
-_invalidConfigFiles = []
-_invalidConfigFiles.append(
-	{"title": "FGDB to FGDB", "case": "incomplete value map, no otherwise", "field": "Phases Built",
-	 "pathToFile": r"<files>/.xml"})
-_invalidConfigFiles.append(
-	{"title": "FGDB to FGDB", "case": "incomplete domain map, no otherwise", "field": "Phases Built",
-	 "pathToFile": r"<files>/.xml"})
-_invalidConfigFiles.append(
-	{"title": "FGDB to view only EGDB", "case": "Copy", "field": "all", "pathToFile": r"<files>/.xml"})
-
+########## XML Syntax ############
 # XML Method Names. Change these if you ever change XML formatting
 _XMLMethodNames = {"None": "None",
                    "Copy": "Copy",

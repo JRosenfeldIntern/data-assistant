@@ -52,6 +52,9 @@ class TestReplace(unittest.TestCase):
 		copyDataPath = os.path.join(_outputDirectory,"copy")
 
 		dlaTesterFunctions.test_replace_data(self, sourceDataPath, targetDataPath,copyDataPath, xmlLocation)
+		dlaTesterFunctions.restoreData(localWorkspace["OriginalPath"],
+		                                       os.path.join(localWorkspace["Target"],lw["TargetName"]))
+
 
 	def testLength(self):
 		dlaTesterFunctions.test_length(tester=self, mode="Replace", localWorkspace=localWorkspace)
@@ -64,9 +67,9 @@ class TestReplace(unittest.TestCase):
 		global localWorkspace
 		localWorkspace = lw
 		suite.addTest(TestReplace("test_replace"))
-		suite.addTest(TestReplace("testData"))
 		suite.addTest(TestReplace("testLength"))
 		suite.addTest(TestReplace("testFields"))
+		suite.addTest(TestReplace("testData"))
 
 		#results = runner.run(suite)
 		return suite

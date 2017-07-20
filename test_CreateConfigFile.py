@@ -2,13 +2,14 @@ import unittest
 import os, sys
 import arcpy
 import filecmp
+import xml.etree.ElementTree as ET
 import shutil
 import pathlib
 from inc_datasources import _daGPTools, _dbConnStr, _configMatrix, _validConfigFiles, \
 	_invalidConfigFiles, _localOutputPath, _localWorkspace
 
 sys.path.insert(0, _daGPTools)
-import dlaCreateSourceTarget, dla, dlaStage
+import dlaCreateSourceTarget, dla, dlaStage, dlaTesterFunctions
 
 
 def importUtilNetworkToolbox():
@@ -69,7 +70,11 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 	# a better solution might be found here:
 	# https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
 	def test_XML(self):
-		self.assertTrue(filecmp.cmp(testCase["outXML"],testCase["correctXML"]))
+		i = testCase["outXML"]
+		k = testCase["correctXML"]
+		outXML = ET.parse(testCase["outXML"]).getroot()
+		correctXML = ET.parse(testCase["correctXML"]).getroot()
+		self.assertTrue(dlaTesterFunctions.xml_compare(outXML,correctXML))
 
 	def run_test(self, tc,lw):
 		suite = unittest.TestSuite()
@@ -82,7 +87,9 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 		localWorkspace = lw
 		suite.addTest(TestCreateConfigWorkflows("test_CreateConfig"))
 		suite.addTest(TestCreateConfigWorkflows("test_XML"))
-		results = runner.run(suite)
+
+		return suite
+		#results = runner.run(suite)
 
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:
