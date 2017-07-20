@@ -68,8 +68,7 @@ class TestPreview(unittest.TestCase):
 		suite.addTest(TestPreview("testFields"))
 		suite.addTest(TestPreview("testData"))
 		suite.addTest(TestPreview("testLength"))
-		return suite
-		#results = runner.run(suite)
+		results = runner.run(suite)
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:
 			for fail in results.failures:

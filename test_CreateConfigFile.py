@@ -82,8 +82,7 @@ class TestCreateConfigWorkflows(unittest.TestCase):
 		localWorkspace = lw
 		suite.addTest(TestCreateConfigWorkflows("test_CreateConfig"))
 		suite.addTest(TestCreateConfigWorkflows("test_XML"))
-		return suite
-		#results = runner.run(suite)
+		results = runner.run(suite)
 
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:

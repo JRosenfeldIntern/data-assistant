@@ -57,8 +57,7 @@ def test_fields(tester, directory, localWorkspace, xmlLocation):  # TODO: Curren
 		tester.assertTrue(fieldnames.__contains__(cfield))
 
 
-# ensures there are a correct amount of rows. At the moment is O(n), there might be a more efficient way that doesn't
-# require iterating through the rows
+# ensures there are a correct amount of rows.
 def test_length(tester, mode, localWorkspace, rowLimit=100):
 	sourceFeatureClass = ""
 	targetFeatureClass = ""
@@ -90,27 +89,42 @@ def test_length(tester, mode, localWorkspace, rowLimit=100):
 		tester.assertEqual(len(targetCursor),len(cursor))
 
 # due to the nature of the ReplaceByField mutation of the attribute table, a seperate function is needed to test it
-def test_replace_data(tester, sourceDataPath, localDataPath, xmlLocation):
-	defaultValues = {}
-	fields = []
-	for field in arcpy.ListFields(localDataPath):
-		defaultValues[field.name] = field.defaultValue
-		fields.append(field.name)
+def test_replace_data(tester, targetDataPath, sourceDataPath, xmlLocation):
+	ReplaceBy = dla.getXmlElements(xmlLocation, "ReplaceBy")[0]
+	FieldName = dla.getNodeValue(ReplaceBy, "FieldName")
+	Operator = dla.getNodeValue(ReplaceBy, "Operator")
+	Value = dla.getNodeValue(ReplaceBy, "Value")
 
-	sourceCursor = arcpy.da.SearchCursor(sourceDataPath,"*")
-	targetCursor = arcpy.da.SearchCursor(localDataPath,"*")
-	
+	for field in dla.getXmlElements(xmlLocation, "Field"): #pulling relevant fields for the cursor from the xml file
+		if str.lower(sourcefield) == "globalid" or str.lower(dla.getNodeValue(field, "TargetName")) == "globalid":
+			continue
+		targetfields.append(dla.getNodeValue(field, "TargetName"))
 
+	indexFieldName = targetfields.index(FieldName)
+	copy = arcpy.da.SearchCursor(copyDataPath, targetfields) # takes a copy of the target before the Replace was done
+	target = arcpy.da.SearchCursor(targetDataPath, targetfields)# identical fields to the copy generator
 
-	for targetRow,sourceRow in zip(targetCursor,sourceCursor): #TODO: Implement test
-		print(targetRow)
-		print(sourceRow)
+	replacedRowsList = []
+	for copyRow, targetRow in zip(copy, target): #will iterate through until all of the copy cursor is exhausted
+		while targetRow != copyRow:
+			if Operator == "=":
+				tester.assertEqual(targetRow[indexFieldName], Value)
+			if Operator == "!=":
+				tester.assertNotEqual(targetRow[indexFieldName], Value)
+			if Operator == "Like":
+				tester.assertIn(Value, targetRow[indexFieldName])
 
+			replacedRowList.append(copyRow)
+			copyRow = copy.next()
 
+	for targetRow, copyRow in zip(target, replacedRowsList): #now iterates through the rows that should have been
+		tester.assertEqual(targetRow, copyRow) # appended to ensure order and accuracy. Here the target cursor starts
+											   # at where the beginning of the re-appended rows should be
 
 # ensures the data fits what it should be according to the specified method
 def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, AppendCheck=False):
 	defaultValues = {}
+	fields = []
 	for field in arcpy.ListFields(localDataPath):
 		defaultValues[field.name] = field.defaultValue
 	# iterates through the fields from xml document and checks value, field by field, row by row
@@ -119,19 +133,16 @@ def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, Appe
 		methods = _XMLMethodNames
 		sourcefield = dla.getNodeValue(field, "SourceName")
 		targetfield = dla.getNodeValue(field, "TargetName")
-		cursor = [row for row in arcpy.da.SearchCursor(localDataPath, targetfield)] #TODO: look into time complexity
-		cursor = cursor[cutoff:]  # brings the target table up to the append point if appending
 
 		if sourcefield == "(None)":  # testing for None must be done outside the main for loop
-			if AppendCheck:
-				for row in cursor:
-					tester.assertEqual(row[0], defaultValues[targetfield])
-				continue
 			for row in cursor:
-				testNone(tester, row[0])
+				testNone(tester,row[0],defaultValues[targetfield],AppendCheck)
 			continue
 
 		sourceCursor = [row for row in arcpy.da.SearchCursor(sourceDataPath, sourcefield)]
+		cursor = [row for row in arcpy.da.SearchCursor(localDataPath, targetfield)] #TODO: look into time complexity
+		cursor = cursor[cutoff:]  # brings the target table up to the append point if appending
+
 
 		for row, sourceRow in zip(cursor, sourceCursor):
 			row = row[0]
@@ -141,47 +152,48 @@ def test_data(tester, sourceDataPath, localDataPath, xmlLocation, cutoff=0, Appe
 						dla.getNodeValue(field, "TargetName")) == "globalid":  # really weird outcomes with globalID
 					continue
 				testCopy(tester, sourceRow, row)
+			elif method == methods["Set Value"]:
+				testSetValue(tester, row,field)
 
-			if method == methods["Set Value"]:
-				testSetValue(tester, row)
+			elif method == methods["Value Map"]:
+				testValueMap(tester, row,field)
 
-			if method == methods["Value Map"]:
-				testValueMap(tester, row)
-
-			if method == methods["Change Case"]:
+			elif method == methods["Change Case"]:
 				testChangeCase(tester, sourceRow, row, field)
 
-			if method == methods["Concatenate"]:
+			elif method == methods["Concatenate"]:
 				testConcatenate(tester, row, field)
 
-			if method == methods["Left"]:
+			elif method == methods["Left"]:
 				testLeft(tester, sourceRow, row, field)
 
-			if method == methods["Right"]:
+			elif method == methods["Right"]:
 				testRight(tester, sourceRow, row, field)
 
-			if method == methods[
-				"Substring"]:  # BUG Substring will take a null field and make substring from 'None' ???
+			elif method == methods["Substring"]:  # BUG Substring will take a null field and make substring from 'None' ???
 				testSubstring(tester, sourceRow, row, field)
 
-			if method == methods["Split"]:
+			elif method == methods["Split"]:
 				testSplit(tester, row, field)
 
-			if method == methods[
-				"Conditional Value"]:  # for some reason to add strings as conditional they must be surrounded by " or '
+			elif method == methods["Conditional Value"]:  # for some reason to add strings as conditional they must be surrounded by " or '
 				testConditionalVal(tester, sourceRow, row, field)
 
-			if method == methods["Domain Map"]:
+			elif method == methods["Domain Map"]:
 				testDomainMap(tester, sourceRow, row, field)
+			else:
+				tester.assertIn(method,methods)
 
 
-def testNone(tester, newTargetValue):  # Very very messy implementation
-	tester.assertIsNone(newTargetValue)
+def testNone(tester, newTargetValue, defaultValue, AppendCheck):  # Very very messy implementation
+	if AppendCheck:
+		tester.assertEqual(newTargetValue,defaultValue)
+	else:
+		tester.assertIsNone(newTargetValue)
 
 
 # checks to see if the Copy function worked properly. Target value should be the same as Source value
-def testCopy(tester, sourceValue, targetValue):
-	# print("source:", sourceValue, "value:", targetValue)
+def testCopy(tester, sourceValue, targetValue): #TODO: Come up with a better way of assesing this
 	try:
 		tester.assertEqual(sourceValue, targetValue)
 	except:
@@ -190,8 +202,9 @@ def testCopy(tester, sourceValue, targetValue):
 			tester.assertEqual(sourceValue, targetValue)
 		except:
 			tester.assertEqual(str(sourceValue), str(
-				targetValue))  # checks to see if the Set Value function worked properly. All Target values should be equal to the value
-def testSetValue(tester, targetValue):
+				targetValue))
+
+def testSetValue(tester, targetValue,field):# checks to see if the Set Value function worked properly. All Target values should be equal to the value
 	setValue = dla.getNodeValue(field, "SetValue")
 	try:
 		setValue = float(setValue)
@@ -202,7 +215,7 @@ def testSetValue(tester, targetValue):
 
 
 # checks to see that if the Source value is equal to sValue, the Target value is equal to tValue
-def testValueMap(tester, targetValue):
+def testValueMap(tester, targetValue,field):
 	valueMaps = field.getElementsByTagName("ValueMap")
 	for valueMap in valueMaps:
 		sourceValues = valueMap.getElementsByTagName("sValue")

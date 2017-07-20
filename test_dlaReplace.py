@@ -49,7 +49,9 @@ class TestReplace(unittest.TestCase):
 		targetFeatureClass = localWorkspace["TargetName"]
 		targetDataPath = os.path.join(targetFCPath, targetFeatureClass)
 
-		dlaTesterFunctions.test_replace_data(self, sourceDataPath, targetDataPath, xmlLocation)
+		copyDataPath = os.path.join(_outputDirectory,"copy")
+
+		dlaTesterFunctions.test_replace_data(self, sourceDataPath, targetDataPath,copyDataPath, xmlLocation)
 
 	def testLength(self):
 		dlaTesterFunctions.test_length(tester=self, mode="Replace", localWorkspace=localWorkspace)
@@ -57,7 +59,6 @@ class TestReplace(unittest.TestCase):
 	def run_test(self, testCase, lw):
 		suite = unittest.TestSuite()
 		runner = unittest.TextTestRunner()
-
 		global xmlLocation
 		xmlLocation = testCase["xmlLocation"]
 		global localWorkspace

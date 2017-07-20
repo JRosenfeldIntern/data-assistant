@@ -61,8 +61,7 @@ class TestStaging(unittest.TestCase):
 		suite.addTest(TestStaging("testFields"))
 		suite.addTest(TestStaging("testData"))
 		suite.addTest(TestStaging("testLength"))
-		return suite
-		#results = runner.run(suite)
+		results = runner.run(suite)
 
 		# check the test and if there are failures, write to disk
 		if len(results.failures) > 0:
