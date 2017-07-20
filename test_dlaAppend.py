@@ -98,7 +98,6 @@ class TestAppend(unittest.TestCase):
 		directory = _outputDirectory
 		copyDataPath = os.path.join(directory, "copy")
 		targetDataPath = os.path.join(localWorkspace["Target"], localWorkspace["TargetName"])
-		dlaTesterFunctions.restoreFeatureClass(copyDataPath, targetDataPath)
 		results = runner.run(suite)
 
 		# check the test and if there are failures, write to disk
