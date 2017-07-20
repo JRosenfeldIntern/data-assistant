@@ -2,9 +2,7 @@ import unittest
 import os, sys
 import arcpy
 import pathlib
-from inc_datasources import _daGPTools, _dbConnStr, _configMatrix, _validConfigFiles, _invalidConfigFiles, \
-	_localOutputPath, \
-	_localWorkspace, _outputDirectory
+from inc_datasources import _daGPTools, _dbConnStr, _configMatrix,_localOutputPath,_localWorkspace, _outputDirectory
 
 sys.path.insert(0, _daGPTools)
 import dla, dlaStage, dlaCreateSourceTarget, dlaTesterFunctions
