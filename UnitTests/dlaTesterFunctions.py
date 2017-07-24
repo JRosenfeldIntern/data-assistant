@@ -14,18 +14,26 @@ from test_All import UnitTests
 pd.set_option('display.width', 1000)
 
 
-# the dla.gdb is the test workspace the feature classes are created in. To pull the one we want, we clear the workspace
-# so that the newly created one is the only one that exists. This function clears the workspace.
-def clearFeatureClasses(directory):
+def clear_feature_classes(directory: str):
+    """
+   the dla.gdb is the test workspace the feature classes are created in. To pull the one we want, we clear the workspace
+   so that the newly created one is the only one that exists. This function clears the workspace.
+    :param directory:
+    :return:
+    """
     arcpy.env.workspace = directory
     featureclasses = arcpy.ListFeatureClasses()
     for featureclass in featureclasses:
         arcpy.Delete_management(os.path.join(directory, featureclass))
 
 
-# takes the xml file and creates the fields that should be in the new feature class
-def build_correct_fields(xmlLocation):
-    fields = dla.getXmlElements(xmlLocation, "Field")
+def build_correct_fields(xml_location: str):
+    """
+   takes the xml file and creates the fields that should be in the new feature class
+    :param xml_location: str
+    :return:
+    """
+    fields = dla.getXmlElements(xml_location, "Field")
     correct_fields = []
     for field in fields:
         if str.lower(dla.getNodeValue(field, "TargetName")) != "globalid":
@@ -33,8 +41,13 @@ def build_correct_fields(xmlLocation):
     return correct_fields
 
 
-def make_copy(directory):
-    clearFeatureClasses(directory)  # creating a copy of the target feature class
+def make_copy(directory: str):
+    """
+    Copies the target feature class into the dla.gdb for comparison in the tests
+    :param directory:  str
+    :return:
+    """
+    clear_feature_classes(directory)  # creating a copy of the target feature class
     arcpy.env.workspace = _localWorkspace["Target"]  # to compare to after append
     arcpy.CopyFeatures_management("Target", os.path.join(directory, "copy"))
 
@@ -52,8 +65,15 @@ def restore_data():
                 unzipper.extractall(workspace)  # TODO: change workspace here to the address to a temp folder
 
 
-# taken from https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
-def xml_compare(x1, x2, reporter=None):
+def xml_compare(x1: ET, x2 : ET, reporter=None):
+    """
+    taken from:
+    https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
+    :param x1:
+    :param x2:
+    :param reporter:
+    :return:
+    """
     if x1.tag != x2.tag:
         if reporter:
             reporter('Tags do not match: %s and %s' % (x1.tag, x2.tag))
@@ -96,7 +116,7 @@ def xml_compare(x1, x2, reporter=None):
     return True
 
 
-def text_compare(t1, t2):
+def text_compare(t1: str, t2: str):
     if not t1 and not t2:
         return True
     if t1 == '*' or t2 == '*':
@@ -109,7 +129,7 @@ class Helper(object):
     Class designed to run all of the tests for any test object, whether it be Preview, Stage, Append, or Replace
     """
 
-    def __init__(self, tester: UnitTests, test_object, lw, tc):
+    def __init__(self, tester: UnitTests, test_object, lw: dict, tc: dict):
         self.tester = tester
         self.testObject = test_object
         self.local_workspace = lw
@@ -133,7 +153,7 @@ class Helper(object):
 
     @staticmethod
     @functools.lru_cache()
-    def build_data_frame(directory, columns):
+    def build_data_frame(directory: str, columns: list):
         """
         Builds and caches a pandas DataFrame object containing the information from the specified feature class
         :param directory: str
@@ -276,7 +296,7 @@ class Helper(object):
             else:
                 self.tester.assertIn(method_dict[field], self.methods)
 
-    def test_none(self, target):
+    def test_none(self, target: pd.Series):
         """
         Ensures that the vector is a vector of none
         :param target:
@@ -284,13 +304,13 @@ class Helper(object):
         """
         self.tester.assertTrue(len(target.unique()) == 1 and target.unique()[0] is None)
 
-    def test_copy(self, source, target):
+    def test_copy(self, source: pd.Series, target: pd.Series):
         """
          Ensures that the copy source got copied to the target. In other words, ensures that the two vectors are equal.
         """
         self.tester.assertTrue(source.equals(target))
 
-    def test_set_value(self, target, value):
+    def test_set_value(self, target: pd.Series, value: pd.Series):
         """
         Ensures that the target values are all set properly
         :param target:
@@ -299,7 +319,7 @@ class Helper(object):
         """
         self.tester.assertTrue(len(target.unique()) == 1 and target.unique() == value)
 
-    def test_value_map(self, source, target, value_dict, otherwise):
+    def test_value_map(self, source: pd.Series, target: pd.Series, value_dict: dict, otherwise):
         """
         Ensures the values are set to what they need to be based on the preset configuration in the value map
         :param source:
@@ -314,7 +334,7 @@ class Helper(object):
             else:
                 self.tester.assertTrue(t == otherwise)
 
-    def test_change_case(self, source, target, manipulation):
+    def test_change_case(self, source: pd.Series, target: pd.Series, manipulation: str):
         """
         Ensures the row correctly was changed
         :param source:
@@ -333,7 +353,7 @@ class Helper(object):
         else:
             self.tester.assertIn(manipulation, ["UpperCase", "Lowercase", "Capitalize", "Title"])
 
-    def test_concatenate(self, target: pd.DataFrame, seperator: str,
+    def test_concatenate(self, target: pd.Series, seperator: str,
                          cfields: list):  # TODO: Ensure test is working correctly
         """
         Ensures the row concatenates the correct field values
@@ -350,7 +370,7 @@ class Helper(object):
             compare_column = compare_column.astype(str).str.cat(source_table[cifeld].astype(str), sep=seperator)
         self.tester.assertEqual(target.astype(str), compare_column)
 
-    def test_left(self, source: pd.DataFrame, target: pd.DataFrame, number: int):
+    def test_left(self, source: pd.Series, target: pd.Series, number: int):
         """
         Ensures the correct number of charcters from the left were mapped
         :param source:
@@ -360,7 +380,7 @@ class Helper(object):
         """
         self.tester.assertEqual(source.str[number:], target)
 
-    def test_right(self, source: pd.DataFrame, target: pd.DataFrame, number: int):
+    def test_right(self, source: pd.Series, target: pd.Series, number: int):
         """
         Ensures the correct number of characters from the right were mapped
         :param source:
@@ -370,7 +390,7 @@ class Helper(object):
         """
         self.tester.assertEqual(source.str[-number:], target)
 
-    def test_substring(self, source: pd.DataFrame, target: pd.DataFrame, start: int, length: int):
+    def test_substring(self, source: pd.Series, target: pd.Series, start: int, length: int):
         """
         Ensures the correct substring was pulled from each row
         :param source:
@@ -381,7 +401,7 @@ class Helper(object):
         """
         self.tester.assertEqual(source.str[start:length + start], target)
 
-    def test_split(self, source: pd.DataFrame, target: pd.DataFrame, split_point: str, part: int):
+    def test_split(self, source: pd.Series, target: pd.Series, split_point: str, part: int):
         """
         Ensures the correct split was made and the resulting data is correct
         :param source:
@@ -393,7 +413,7 @@ class Helper(object):
         for sfield, tfield in zip(source, target):
             self.tester.assertEqual(sfield.split(split_point)[part], tfield)
 
-    def test_conditional_value(self, source: pd.DataFrame, target: pd.DataFrame, oper: str, if_value,
+    def test_conditional_value(self, source: pd.Series, target: pd.Series, oper: str, if_value,
                                then_value, else_value):
         """
         Ensures that the conditional value evaluates correctly in each row of the column
@@ -429,7 +449,7 @@ class Helper(object):
             else:
                 self.tester.assertIn(oper, ["==", "!=", "<", ">"])
 
-    def test_domain_map(self, source, target, mappings):
+    def test_domain_map(self, source: pd.Series, target: pd.Series, mappings: dict):
         """
         Ensures the domain map pairings are correctly mapped in the target column
         :param self:
@@ -472,7 +492,7 @@ class SourceTargetParser(object):
     Class designed to store the essential parts of the xml file in readable python data structrues
     """
 
-    def __init__(self, xml_file):
+    def __init__(self, xml_file: str):
         self.xmlLocation = xml_file
         self.xml = ET.parse(self.xmlLocation).getroot()
         self.targetFields = []

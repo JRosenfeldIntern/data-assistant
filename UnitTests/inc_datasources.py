@@ -1,4 +1,5 @@
-import os, sys, pathlib
+import os
+import pathlib
 
 # Path to Data Assistant tools
 _daGPTools = r"C:\Users\Win10\AppData\Local\ESRI\ArcGISPro\AssemblyCache\{28142961-b645-420f-ba2a-72bcf8212558}\GPTools\arcpy"
@@ -10,11 +11,11 @@ _outputDirectory = str(pathlib.Path(__file__).parents[0] / 'dla.gdb')
 # DB Workspaces
 _localWorkspace = []
 _localWorkspace.append(
-	{"Source": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
-	 "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
-	 "SourceName": "source",
-	 "TargetName": "Target",
-	 "OriginalPath":str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})
+    {"Source": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
+     "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
+     "SourceName": "source",
+     "TargetName": "Target",
+     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})
 # _localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
 #                       "Target":str(pathlib.Path(".\localData").absolute()),
 #                        "SourceName":"source.lyrx",
@@ -40,7 +41,7 @@ _configMatrix.append({"Source": _dbConnStr[0],
                       "xmlLocation": os.path.join(_localOutputPath, "GDB_to_GDB.xml"),
                       "outXML": os.path.join(_localOutputPath, "test_GDB.xml"),
                       "correctXML": str(pathlib.Path(r".\testOutput\correctXML\GDB\correct_GDB.xml").absolute()),
-                      "MatchLibrary":str(pathlib.Path(r".\testOutput\correctXML\GDB\MatchLocal.xml").absolute())})
+                      "MatchLibrary": str(pathlib.Path(r".\testOutput\correctXML\GDB\MatchLocal.xml").absolute())})
 # _configMatrix.append({"Source":_dbConnStr[2],
 #                      "Target":_dbConnStr[3],
 #                      "xmlLocation":os.path.join(_localOutputPath,"lyrx_to_lyrx.xml"),

@@ -35,7 +35,7 @@ class UnitTests(unittest.TestCase):
     """
 
     def setUp(self):
-        tf.clearFeatureClasses(_outputDirectory)
+        tf.clear_feature_classes(_outputDirectory)
         pass
 
     def tearDown(self):

@@ -90,7 +90,7 @@ class Preview(BaseClass):
         :return: None or False
         """
         arcpy.env.workspace = self.directory
-        dlaTesterFunctions.clearFeatureClasses(self.directory)
+        dlaTesterFunctions.clear_feature_classes(self.directory)
         dlaPreview.rowLimit = self.rowLimit
         return dlaPreview.preview(self.xmlLocation)  # creates the new feature class
 
@@ -113,7 +113,7 @@ class Stage(BaseClass):
         :return: None or False
         """
         arcpy.env.workspace = self.directory
-        dlaTesterFunctions.clearFeatureClasses(self.directory)
+        dlaTesterFunctions.clear_feature_classes(self.directory)
         return dlaStage.stage(self.xmlLocation)  # creates the new feature class
 
 
