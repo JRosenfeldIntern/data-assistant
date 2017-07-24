@@ -55,9 +55,9 @@ def preview(xmlFileName):
     # dla.addError("Unable to open your project, please ensure it is in the same folder as your current project or your Config file")
     # return False
 
-    if source == "" or source == None:
+    if source == "" or source is None:
         source = dla.getDatasetPath(xmlDoc, "Source")
-    if target == "" or target == None:
+    if target == "" or target is None:
         target = dla.getDatasetPath(xmlDoc, "Target")
 
     if dla.isTable(source) or dla.isTable(target):
