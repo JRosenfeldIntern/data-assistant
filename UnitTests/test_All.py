@@ -3,30 +3,10 @@ import unittest
 
 import create
 from inc_datasources import _daGPTools, _configMatrix, _localWorkspace, _outputDirectory
-
-sys.path.insert(0, _daGPTools)
 import dlaTesterFunctions as tf
 from dlaTesterFunctions import Helper
 
-
-#
-# if __name__ == '__main__':
-# 	createConfig = test_CreateConfigFile.TestCreateConfigWorkflows()
-# 	preview = test_dlaPreview.TestPreview()
-# 	stage = test_dlaStage.TestStaging()
-# 	append = test_dlaAppend.TestAppend()
-# 	replace = test_dlaReplace.TestReplace()
-#
-# 	for testCase, lw in zip(_configMatrix, _localWorkspace):
-# 		suite = unittest.TestSuite()
-# 		suite.addTest(createConfig.run_test(testCase, lw))
-# 		#suite.addTest(preview.run_test(testCase, lw))
-# 		suite.addTest(append.run_test(testCase, lw))
-# 		#suite.addTest(replace.run_test(testCase,lw))
-# 		#suite.addTest(stage.run_test(testCase, lw))
-#
-# 		runner = unittest.TextTestRunner()
-# 		runner.run(suite)
+sys.path.insert(0, _daGPTools)
 
 
 class UnitTests(unittest.TestCase):
@@ -48,21 +28,28 @@ class UnitTests(unittest.TestCase):
         :return: None
         """
         for test_case, local_workspace in zip(_configMatrix, _localWorkspace):
-            suite = unittest.TestCase()
+            suite = unittest.TestSuite()
+            runner = unittest.TextTestRunner()
+
             create_config = create.CreateConfig(local_workspace, test_case)
             preview = create.Preview(local_workspace, test_case)  # optional parameter to set row limit
             stage = create.Stage(local_workspace, test_case)
             append = create.Append(local_workspace, test_case)
             replace = create.Replace(local_workspace, test_case)
 
-            configTest = Helper(self, create_config, local_workspace, test_case)
-            previewTest = Helper(self, preview, local_workspace, test_case)
-            stageTest = Helper(self, stage, local_workspace, test_case)
-            appendTest = Helper(self, append, local_workspace, test_case)
-            replace = Helper(self, replace, local_workspace, test_case)
+            config_test = Helper(self, create_config, local_workspace, test_case)
+            preview_test = Helper(self, preview, local_workspace, test_case)
+            stage_test = Helper(self, stage, local_workspace, test_case)
+            append_test = Helper(self, append, local_workspace, test_case)
+            replace_test = Helper(self, replace, local_workspace, test_case)
 
-            # configTest.run_tests()                One or the other between these two, not sure yet
-            # runner.addTest(configTest.run_tests())
+            suite.addTest(config_test.main())
+            suite.addTest(preview_test.main())
+            suite.addTest(stage_test.main())
+            suite.addTest(append_test.main())
+            suite.addTest(replace_test.main())
+
+            results = runner.run(suite)
 
 
 if __name__ == '__main__':

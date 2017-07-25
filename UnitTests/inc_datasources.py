@@ -9,13 +9,13 @@ _outputDirectory = str(pathlib.Path(__file__).parents[0] / 'dla.gdb')
 
 ########### Source and Target ##########
 # DB Workspaces
-_localWorkspace = []
+_localWorkspace = list()
 _localWorkspace.append(
     {"Source": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
      "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
      "SourceName": "source",
      "TargetName": "Target",
-     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})
+     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})  # might not need
 # _localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
 #                       "Target":str(pathlib.Path(".\localData").absolute()),
 #                        "SourceName":"source.lyrx",
@@ -23,7 +23,7 @@ _localWorkspace.append(
 
 
 # DB Connection
-_dbConnStr = []
+_dbConnStr = list()
 _dbConnStr.append({"title": "GDB Source",
                    "dataPath": str(pathlib.Path(".\localData\WaterDataMigration.gdb\source").absolute())})
 _dbConnStr.append({"title": "GDB Target",
@@ -35,7 +35,7 @@ _dbConnStr.append({"title": "Layer Target",
                    "dataPath": str(pathlib.Path(".\localData\Target.lyrx").absolute())})
 
 ########### Source and Target Matrix ##########
-_configMatrix = []
+_configMatrix = list()
 _configMatrix.append({"Source": _dbConnStr[0],
                       "Target": _dbConnStr[1],
                       "xmlLocation": os.path.join(_localOutputPath, "GDB_to_GDB.xml"),
@@ -49,7 +49,7 @@ _configMatrix.append({"Source": _dbConnStr[0],
 
 
 ########## XML Syntax ############
-# XML Method Names. Change these if you ever change XML formatting
+# XML Method Names. Change these if XML formatting ever changes
 _XMLMethodNames = {"None": "None",
                    "Copy": "Copy",
                    "Set Value": "SetValue",

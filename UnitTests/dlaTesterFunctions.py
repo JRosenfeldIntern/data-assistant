@@ -6,13 +6,13 @@ import zipfile
 
 import arcpy
 import pandas as pd
-
+import sys
 import dla
-from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory
+from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
 from test_All import UnitTests
 
 pd.set_option('display.width', 1000)
-
+sys.path.insert(0, _daGPTools)
 
 def clear_feature_classes(directory: str):
     """
@@ -27,7 +27,7 @@ def clear_feature_classes(directory: str):
         arcpy.Delete_management(os.path.join(directory, featureclass))
 
 
-def build_correct_fields(xml_location: str):
+def build_correct_fields(xml_location: str, include_globalID: bool):
     """
    takes the xml file and creates the fields that should be in the new feature class
     :param xml_location: str
@@ -36,7 +36,7 @@ def build_correct_fields(xml_location: str):
     fields = dla.getXmlElements(xml_location, "Field")
     correct_fields = []
     for field in fields:
-        if str.lower(dla.getNodeValue(field, "TargetName")) != "globalid":
+        if not include_globalID and str.lower(dla.getNodeValue(field, "TargetName")) != "globalid":
             correct_fields.append(dla.getNodeValue(field, "TargetName"))
     return correct_fields
 
@@ -55,7 +55,6 @@ def make_copy(directory: str):
 def restore_data():
     """
     After the data is replaced or appended, this function will restore the target to the original state
-    :param path_to_zip:
     :return:
     """
     workspace = str(pathlib.Path(".\localData").absolute())
@@ -65,7 +64,7 @@ def restore_data():
                 unzipper.extractall(workspace)  # TODO: change workspace here to the address to a temp folder
 
 
-def xml_compare(x1: ET, x2 : ET, reporter=None):
+def xml_compare(x1: ET, x2: ET, reporter=None):
     """
     taken from:
     https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
@@ -117,6 +116,13 @@ def xml_compare(x1: ET, x2 : ET, reporter=None):
 
 
 def text_compare(t1: str, t2: str):
+    """
+    taken from:
+    https://bitbucket.org/ianb/formencode/src/tip/formencode/doctest_xml_compare.py?fileviewer=file-view-default#cl-70
+    :param t1:
+    :param t2:
+    :return:
+    """
     if not t1 and not t2:
         return True
     if t1 == '*' or t2 == '*':
@@ -153,7 +159,7 @@ class Helper(object):
 
     @staticmethod
     @functools.lru_cache()
-    def build_data_frame(directory: str, columns: list):
+    def build_data_frame(directory: str, columns: tuple):
         """
         Builds and caches a pandas DataFrame object containing the information from the specified feature class
         :param directory: str
@@ -178,8 +184,7 @@ class Helper(object):
         and not tampered with
         :return:
         """
-        # TODO: Currently omitting GlobalID checks
-        correct_fields = build_correct_fields(self.xmlLocation)
+        correct_fields = build_correct_fields(self.xmlLocation, self.testObject.globalIDCheck)
         if self.testObject.title in ["Append", "Replace"]:
             fields = arcpy.ListFields(self.targetDataPath)
         else:
@@ -187,8 +192,12 @@ class Helper(object):
 
         fieldnames = []
         for field in fields:
-            if field.name.lower() not in ["", "objectid", "shape", "globalid"]:
-                fieldnames.append(field.name)
+            if self.testObject.globalIDCheck:
+                if field.name.lower() not in ["", "objectid", "shape"]:
+                    fieldnames.append(field.name)
+            else:
+                if field.name.lower() not in ["", "objectid", "shape", "globalid"]:
+                    fieldnames.append(field.name)
 
         for cfield in correct_fields:
             self.tester.assertIn(fieldnames, cfield)
@@ -354,7 +363,7 @@ class Helper(object):
             self.tester.assertIn(manipulation, ["UpperCase", "Lowercase", "Capitalize", "Title"])
 
     def test_concatenate(self, target: pd.Series, seperator: str,
-                         cfields: list):  # TODO: Ensure test is working correctly
+                         cfields: list):
         """
         Ensures the row concatenates the correct field values
         :param target:
@@ -460,7 +469,7 @@ class Helper(object):
         """
         for s, t in zip(source, target):
             if s in mappings:
-                self.tester.assertEqual(mappings[s] == t)
+                self.tester.assertEqual(mappings[s], t)
 
     def test_xml(self):
         """
@@ -539,9 +548,10 @@ class SourceTargetParser(object):
             sourcename = field.find('SourceName').text
             targetname = field.find('TargetName').text
             pairings[targetname] = sourcename
+        return pairings
 
     @functools.lru_cache()
-    def get_methods(self):
+    def get_methods(self) -> dict:
         """
         Returns and caches the methods in order of appearence in the xml file.
         :return:
@@ -575,23 +585,18 @@ class SourceTargetParser(object):
         """
         fields = self.xml.find('Fields').getchildren()
         for field in fields:
-            targetName = field.find('TargetName').text
-            sourceName = field.find('SourceName').text
+            target_name = field.find('TargetName').text
             method = field.find('Method').text  # added for visibility
 
-            self.targetFields.append(targetName)
-            self.sourceFields.append(sourceName)
-            self.methodList.append(method)
-
             if method == self.methods["Set Value"]:
-                self.Data[targetName][self.methods["Set Value"]] = field.find(self.methods["Set Value"]).text
-            elif method == self.methods["Domain Map"]:  # TODO: might want to review this. maybe will work, maybe won't
-                DomainMap = field.find(self.methods["Domain Map"]).getchildren()
-                for tag in DomainMap:
+                self.Data[target_name][self.methods["Set Value"]] = field.find(self.methods["Set Value"]).text
+            elif method == self.methods["Domain Map"]:
+                domain_map = field.find(self.methods["Domain Map"]).getchildren()
+                for tag in domain_map:
                     if tag.tag == "sValue":
                         svalue = tag.text
                     if tag.tag == "tValue":
-                        self.Data[targetName][self.methods["Domain Map"]][svalue] = tag.text
+                        self.Data[target_name][self.methods["Domain Map"]][svalue] = tag.text
                         svalue = ""
             elif method == self.methods["Value Map"]:
                 ValueMap = field.find(self.methods["value Map"]).getchildren()
@@ -599,31 +604,31 @@ class SourceTargetParser(object):
                     if tag.tag == "sValue":
                         svalue = tag.text
                     elif tag.tag == "tValue":
-                        self.Data[targetName][self.methods["Value Map"]][svalue] = tag.text
+                        self.Data[target_name][self.methods["Value Map"]][svalue] = tag.text
                         svalue = ""
                     elif tag.tag == "Otherwise":
-                        self.Data[targetName]["Otherwise"] = tag.text
+                        self.Data[target_name]["Otherwise"] = tag.text
             elif method == self.methods["Change Case"]:
-                self.Data[targetName][self.methods["Change Case"]] = field.find(self.method["Change Case"]).text
+                self.Data[target_name][self.methods["Change Case"]] = field.find(self.methods["Change Case"]).text
             elif method == self.methods["Concatenate"]:
-                self.Data[targetName]["Separator"] = field.find("Separator").text
+                self.Data[target_name]["Separator"] = field.find("Separator").text
                 cfields = field.find("cfields").getchildren()
                 for cfield in cfields:
-                    self.Data[targetName][self.methods["Concatenate"]].append(cfield.find('Name').text)
+                    self.Data[target_name][self.methods["Concatenate"]].append(cfield.find('Name').text)
             elif method == self.methods["Left"]:
-                self.Data[targetName][self.methods["Left"]] = int(field.find(self.methods["Left"]).text)
+                self.Data[target_name][self.methods["Left"]] = int(field.find(self.methods["Left"]).text)
             elif method == self.methods["Right"]:
-                self.Data[targetName][self.methods["Right"]] = int(field.find(self.methods["Right"]).text)
+                self.Data[target_name][self.methods["Right"]] = int(field.find(self.methods["Right"]).text)
             elif method == self.methods["Substring"]:
-                self.Data[targetName]["Start"] = int(field.find('Start').text)
-                self.Data[targetName]["Length"] = int(field.find('Length').text)
+                self.Data[target_name]["Start"] = int(field.find('Start').text)
+                self.Data[target_name]["Length"] = int(field.find('Length').text)
             elif method == self.methods["Split"]:
-                self.Data[targetName]["SplitAt"] = field.find("SplitAt").text
-                self.Data[targetName]["Part"] = int(field.find("Part").text)
+                self.Data[target_name]["SplitAt"] = field.find("SplitAt").text
+                self.Data[target_name]["Part"] = int(field.find("Part").text)
             elif method == self.methods["Conditional Value"]:
-                self.Data[targetName]["Oper"] = field.find("Oper").text.strip("\'").strip("\"")
-                self.Data[targetName]["If"] = field.find("If").text.strip("\'").strip("\"")
-                self.Data[targetName]["Then"] = field.find("Then").text.strip("\'").strip("\"")
-                self.Data[targetName]["Else"] = field.find("Else").text.strip("\'").strip("\"")
+                self.Data[target_name]["Oper"] = field.find("Oper").text.strip("\'").strip("\"")
+                self.Data[target_name]["If"] = field.find("If").text.strip("\'").strip("\"")
+                self.Data[target_name]["Then"] = field.find("Then").text.strip("\'").strip("\"")
+                self.Data[target_name]["Else"] = field.find("Else").text.strip("\'").strip("\"")
             else:
                 assert method in self.methods.values()

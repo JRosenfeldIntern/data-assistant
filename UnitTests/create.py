@@ -10,6 +10,7 @@ import dlaPublish
 import dlaStage
 import dlaTesterFunctions
 from inc_datasources import _outputDirectory
+import dla
 
 
 class BaseClass(object):
@@ -20,6 +21,7 @@ class BaseClass(object):
         self.localWorkspace = lw
         self.TestCase = tc
         self.xmlLocation = tc["xmlLocation"]
+        self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
         self.title = self.__class__.__name__
 
 
@@ -77,20 +79,14 @@ class Preview(BaseClass):
     """
 
     def __init__(self, lw, tc, rl=100):
-        self.localWorkspace = lw
-        self.TestCase = tc
-        self.xmlLocation = tc["xmlLocation"]
-        self.directory = _outputDirectory
+        super().__init__(lw, tc)
         self.rowLimit = rl
-        self.title = "Preview"
 
     def main(self):
         """
         Creates a preview feature class in dla.gdb for testing
         :return: None or False
         """
-        arcpy.env.workspace = self.directory
-        dlaTesterFunctions.clear_feature_classes(self.directory)
         dlaPreview.rowLimit = self.rowLimit
         return dlaPreview.preview(self.xmlLocation)  # creates the new feature class
 
@@ -101,19 +97,13 @@ class Stage(BaseClass):
     """
 
     def __init__(self, lw, tc):
-        self.localWorkspace = lw
-        self.TestCase = tc
-        self.xmlLocation = tc["xmlLocation"]
-        self.directory = _outputDirectory
-        self.title = "Stage"
+        super().__init__(lw, tc)
 
     def main(self):
         """
         Creates a staged version of the code in a feature class in dla.gdb for testing
         :return: None or False
         """
-        arcpy.env.workspace = self.directory
-        dlaTesterFunctions.clear_feature_classes(self.directory)
         return dlaStage.stage(self.xmlLocation)  # creates the new feature class
 
 
@@ -123,11 +113,8 @@ class Append(BaseClass):
     """
 
     def __init__(self, lw: dict, tc: dict):
-        self.localWorkspace = lw
-        self.TestCase = tc
-        self.xmlLocation = tc["xmlLocation"]
+        super().__init__(lw, tc)
         self.directory = _outputDirectory
-        self.title = "Append"
 
     def main(self):
         """
@@ -146,11 +133,8 @@ class Replace(BaseClass):
     """
 
     def __init__(self, lw: dict, tc: dict):
-        self.localWorkspace = lw
-        self.TestCase = tc
+        super().__init__(lw, tc)
         self.directory = _outputDirectory
-        self.xmlLocation = tc["xmlLocation"]
-        self.title = "Replace"
 
     def main(self):
         """
