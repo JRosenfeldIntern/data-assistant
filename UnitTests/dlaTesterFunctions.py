@@ -1,18 +1,19 @@
 import functools
 import os
 import pathlib
+import sys
+import unittest
 import xml.etree.ElementTree as ET
 import zipfile
-
 import arcpy
 import pandas as pd
-import sys
+
 import dla
 from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
-from test_All import UnitTests
 
 pd.set_option('display.width', 1000)
 sys.path.insert(0, _daGPTools)
+
 
 def clear_feature_classes(directory: str):
     """
@@ -130,32 +131,39 @@ def text_compare(t1: str, t2: str):
     return (t1 or '').strip() == (t2 or '').strip()
 
 
-class Helper(object):
+class Helper(unittest.TestCase):
     """
     Class designed to run all of the tests for any test object, whether it be Preview, Stage, Append, or Replace
     """
 
-    def __init__(self, tester: UnitTests, test_object, lw: dict, tc: dict):
-        self.tester = tester
+    def __init__(self,test_object, lw: dict, tc: dict):
         self.testObject = test_object
         self.local_workspace = lw
-        self.TestCase = tc
+        self.test_case = tc
         self.localDirectory = _outputDirectory
         self.sourceWorkspace = lw["Source"]
         self.targetWorkspace = lw["Target"]
         self.sourceFC = lw["SourceName"]
         self.targetFC = lw["TargetName"]
-        self.localFC = arcpy.ListFeatureClasses(self.localDirectory)[0]
+        arcpy.env.workspace = self.localDirectory
+        self.localFC = arcpy.ListFeatureClasses()[0]
+        arcpy.env.workspace = ""
+        self.localDataPath = os.path.join(_outputDirectory, self.localFC)
+        self.localFields = tuple(arcpy.ListFields(self.localDataPath))
         self.sourceDataPath = os.path.join(lw["Source"], lw["SourceName"])
         self.targetDataPath = os.path.join(lw["Target"], lw["TargetName"])
-        self.localDataPath = os.path.join(_outputDirectory, self.localFC)
         self.sourceFields = tuple(arcpy.ListFields(self.sourceDataPath))
         self.targetFields = tuple(arcpy.ListFields(self.targetDataPath))
-        self.localFields = tuple(arcpy.ListFields(self.localDataPath))
         self.methods = _XMLMethodNames
-        self.xmlLocation = self.TestCase["xmlLocation"]
+        self.xmlLocation = self.test_case["xmlLocation"]
         self.outXML = tc["outXML"]
         self.correctXML = tc["correctXML"]
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
     @staticmethod
     @functools.lru_cache()
@@ -184,6 +192,8 @@ class Helper(object):
         and not tampered with
         :return:
         """
+        if self.testObject.title not in ["Preview", "Stage", "Append", "Replace"]:  # change this list if any more
+            return                                                       # functions need to test fields
         correct_fields = build_correct_fields(self.xmlLocation, self.testObject.globalIDCheck)
         if self.testObject.title in ["Append", "Replace"]:
             fields = arcpy.ListFields(self.targetDataPath)
@@ -200,36 +210,40 @@ class Helper(object):
                     fieldnames.append(field.name)
 
         for cfield in correct_fields:
-            self.tester.assertIn(fieldnames, cfield)
+            self.assertIn(cfield, fieldnames)
 
     def test_length(self):
         """
         Ensures that the mutated file, depending on which it is, is the correct needed length
         :return:
         """
-        source_table = self.build_data_frame(self.sourceDataPath, self.sourceFields)
-        local_table = self.build_data_frame(self.localDataPath, self.sourceFields)
-        target_table = self.build_data_frame(self.targetDataPath, self.targetFields)
+        if self.testObject.title not in ["Preview", "Stage", "Append", "Replace"]:  # change this list if any more
+            return                                                       # functions need to test length
+        source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
+        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.targetFields]))
+        target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
         mode = self.testObject.title  # variable assignment to help with readability
         if mode == "Preview":
             if len(source_table) < self.testObject.RowLimit:
-                self.tester.assertEqual(len(local_table), len(source_table))
+                self.assertEqual(len(local_table), len(source_table))
             else:
-                self.tester.assertEqual(len(local_table), self.testObject.Rowlimit)
+                self.assertEqual(len(local_table), self.testObject.Rowlimit)
         elif mode == "Stage":
-            self.tester.assertEqual(len(local_table), len(source_table))
+            self.assertEqual(len(local_table), len(source_table))
         elif mode == "Append":
-            self.tester.assertEqual(len(target_table), len(local_table) + len(source_table))
+            self.assertEqual(len(target_table), len(local_table) + len(source_table))
         elif mode == "Replace":
-            self.tester.assertEqual(len(target_table), len(local_table))
+            self.assertEqual(len(target_table), len(local_table))
         else:
-            self.tester.assertIn(mode, ["Preview", "Stage", "Append", "Replace"])
+            self.assertIn(mode, ["Preview", "Stage", "Append", "Replace"])
 
     def test_replace_data(self):
         """
         Ensures the correct rows were appended and removed and in the correct order
         :return:
         """
+        if self.testObject.title != "Replace":
+            return
         replaced_rows_list = []
         copy = self.build_data_frame(self.localDataPath, self.localFields).iterrows()
         target = self.build_data_frame(self.targetDataPath, self.targetFields).iterrows()
@@ -237,17 +251,17 @@ class Helper(object):
         for copy_row, targetRow in zip(copy, target):  # will iterate through until all of the copy cursor is exhausted
             while targetRow != copy_row:
                 if replace_dict["Operator"] == "=":
-                    self.tester.assertEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
+                    self.assertEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
                 if replace_dict["Operator"] == "!=":
-                    self.tester.assertNotEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
+                    self.assertNotEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
                 if replace_dict["Operator"] == "Like":
-                    self.tester.assertIn(replace_dict["Value"], targetRow[replace_dict["FieldName"]])
+                    self.assertIn(replace_dict["Value"], targetRow[replace_dict["FieldName"]])
                 replaced_rows_list.append(copy_row)
                 copy_row = copy.next()
 
         for targetRow, copy_row in zip(target,
                                        replaced_rows_list):  # now iterates through the rows that should have been
-            self.tester.assertEqual(targetRow,
+            self.assertEqual(targetRow,
                                     copy_row)  # appended to ensure order and accuracy. Here the target cursor starts
             # at where the beginning of the re-appended rows should be
 
@@ -257,78 +271,81 @@ class Helper(object):
         performed correctly
         :return:
         """
-        source_table = self.build_data_frame(self.sourceDataPath, self.sourceFields)
-        local_table = self.build_data_frame(self.localDataPath, self.localFields)
-        target_table = self.build_data_frame(self.targetDataPath, self.targetFields)
-        xml_fields = self.get_xml_parse().get_pairings()
-        method_dict = self.get_xml_parse().get_methods()
-        xml_data = self.get_xml_parse.Data
+        if self.testObject not in ["Preview","Stage","Append"]:
+            return
+        source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
+        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.targetFields]))
+        target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
+        parse_object = self.get_xml_parse()
+        xml_fields = parse_object.get_pairings()
+        method_dict = parse_object.get_methods()
+        xml_data = parse_object.get_data()
 
-        if self.testObject.title in ["Preiview", "Stage"]:  # needed so that we can use the same function to test append
+        if self.testObject.title in ["Preview", "Stage"]:  # needed so that we can use the same function to test append
             target = local_table
         else:
-            self.tester.assertEqual(target_table.iloc[:len(local_table)], local_table)
+            self.assertEqual(target_table.iloc[:len(local_table)], local_table)  # TODO: Currently throws error about incompatable data frames
             target = target_table.iloc[len(local_table):]  # ensures we are only comparing the newly appended data
 
         for field in xml_fields.keys():
             if method_dict[field] == self.methods["None"]:
-                self.test_none(target[field])
+                self.none_test(target[field])
             elif method_dict[field] == self.methods["Copy"]:
-                self.test_copy(source_table[xml_fields[field]], target[field])
+                self.copy_test(source_table[xml_fields[field]], target[field])
             elif method_dict[field] == self.methods["Set Value"]:
-                self.test_set_value(target[field], xml_data[field][self.methods["Set Value"]])
+                self.set_value_test(target[field], xml_data[field][self.methods["Set Value"]])
             elif method_dict[field] == self.methods["Value Map"]:
-                self.test_value_map(source_table[xml_fields[field]], target[field],
+                self.value_map_test(source_table[xml_fields[field]], target[field],
                                     xml_data[field][self.methods["Value Map"]], xml_data[field]["Otherwise"])
             elif method_dict[field] == self.methods["Change Case"]:
-                self.test_change_case(source_table[xml_fields[field]], target[field],
+                self.change_case_test(source_table[xml_fields[field]], target[field],
                                       xml_data[field][self.methods["Change Case"]])
             elif method_dict[field] == self.methods["Concatenate"]:
-                self.test_concatenate(target[field], xml_data[field]["Separator"],
+                self.concatenate_test(target[field], xml_data[field]["Separator"],
                                       xml_data[field]["Concatenate"])
             elif method_dict[field] == self.methods["Left"]:
-                self.test_left(source_table[xml_fields[field]], target[field], xml_data[field]["Left"])
+                self.left_test(source_table[xml_fields[field]], target[field], xml_data[field]["Left"])
             elif method_dict[field] == self.methods["Right"]:
-                self.test_right(source_table[xml_fields[field]], target[field], xml_data[field]["Right"])
+                self.right_test(source_table[xml_fields[field]], target[field], xml_data[field]["Right"])
             elif method_dict[field] == self.methods["Substring"]:
-                self.test_substring(source_table[xml_fields[field]], target[field], xml_data[field]["Start"],
+                self.substring_test(source_table[xml_fields[field]], target[field], xml_data[field]["Start"],
                                     xml_data[field]["Length"])
             elif method_dict[field] == self.methods["Split"]:
-                self.test_split(source_table[xml_fields[field]], target[field], xml_data[field]["SplitAt"],
+                self.split_test(source_table[xml_fields[field]], target[field], xml_data[field]["SplitAt"],
                                 xml_data[field]["Part"])
             elif method_dict[field] == self.methods["Conditional Value"]:
-                self.test_conditional_value(source_table[xml_fields[field]], target[field],
+                self.conditional_value_test(source_table[xml_fields[field]], target[field],
                                             xml_data[field]["Oper"], xml_data[field]["If"], xml_data[field]["Then"],
                                             xml_data[field]["Else"])
             elif method_dict[field] == self.methods["Domain Map"]:
-                self.test_domain_map(source_table[xml_fields[field]], target[field], xml_data[field]["Domain Map"])
+                self.domain_map_test(source_table[xml_fields[field]], target[field], xml_data[field]["Domain Map"])
             else:
-                self.tester.assertIn(method_dict[field], self.methods)
+                self.assertIn(method_dict[field], self.methods)
 
-    def test_none(self, target: pd.Series):
+    def none_test(self, target: pd.Series):
         """
         Ensures that the vector is a vector of none
         :param target:
         :return:
         """
-        self.tester.assertTrue(len(target.unique()) == 1 and target.unique()[0] is None)
+        self.assertTrue(len(target.unique()) == 1 and target.unique()[0] is None)
 
-    def test_copy(self, source: pd.Series, target: pd.Series):
+    def copy_test(self, source: pd.Series, target: pd.Series):
         """
          Ensures that the copy source got copied to the target. In other words, ensures that the two vectors are equal.
         """
-        self.tester.assertTrue(source.equals(target))
+        self.assertTrue(source.equals(target))
 
-    def test_set_value(self, target: pd.Series, value: pd.Series):
+    def set_value_test(self, target: pd.Series, value: pd.Series):
         """
         Ensures that the target values are all set properly
         :param target:
         :param value:
         :return:
         """
-        self.tester.assertTrue(len(target.unique()) == 1 and target.unique() == value)
+        self.assertTrue(len(target.unique()) == 1 and target.unique() == value)
 
-    def test_value_map(self, source: pd.Series, target: pd.Series, value_dict: dict, otherwise):
+    def value_map_test(self, source: pd.Series, target: pd.Series, value_dict: dict, otherwise):
         """
         Ensures the values are set to what they need to be based on the preset configuration in the value map
         :param source:
@@ -339,11 +356,11 @@ class Helper(object):
         """
         for s, t in zip(source, target):
             if s in value_dict:
-                self.tester.assertTrue(t == value_dict[s])
+                self.assertTrue(t == value_dict[s])
             else:
-                self.tester.assertTrue(t == otherwise)
+                self.assertTrue(t == otherwise)
 
-    def test_change_case(self, source: pd.Series, target: pd.Series, manipulation: str):
+    def change_case_test(self, source: pd.Series, target: pd.Series, manipulation: str):
         """
         Ensures the row correctly was changed
         :param source:
@@ -352,17 +369,17 @@ class Helper(object):
         :return:
         """
         if manipulation == "UpperCase":
-            self.tester.assertEqual(source, target.str.upper())
+            self.assertEqual(source, target.str.upper())
         elif manipulation == "Lowercase":
-            self.tester.assertEqual(source, target.str.lower())
+            self.assertEqual(source, target.str.lower())
         elif manipulation == "Capitalize":
-            self.tester.assertEqual(source, target.str.capitalize())
+            self.assertEqual(source, target.str.capitalize())
         elif manipulation == "Title":
-            self.tester.assertEqual(source, target.str.title())
+            self.assertEqual(source, target.str.title())
         else:
-            self.tester.assertIn(manipulation, ["UpperCase", "Lowercase", "Capitalize", "Title"])
+            self.assertIn(manipulation, ["UpperCase", "Lowercase", "Capitalize", "Title"])
 
-    def test_concatenate(self, target: pd.Series, seperator: str,
+    def concatenate_test(self, target: pd.Series, seperator: str,
                          cfields: list):
         """
         Ensures the row concatenates the correct field values
@@ -377,9 +394,9 @@ class Helper(object):
         compare_column = source_table[cfields.pop()]
         for cifeld in cfields:
             compare_column = compare_column.astype(str).str.cat(source_table[cifeld].astype(str), sep=seperator)
-        self.tester.assertEqual(target.astype(str), compare_column)
+        self.assertEqual(target.astype(str), compare_column)
 
-    def test_left(self, source: pd.Series, target: pd.Series, number: int):
+    def left_test(self, source: pd.Series, target: pd.Series, number: int):
         """
         Ensures the correct number of charcters from the left were mapped
         :param source:
@@ -387,9 +404,9 @@ class Helper(object):
         :param number: int
         :return:
         """
-        self.tester.assertEqual(source.str[number:], target)
+        self.assertEqual(source.str[number:], target)
 
-    def test_right(self, source: pd.Series, target: pd.Series, number: int):
+    def right_test(self, source: pd.Series, target: pd.Series, number: int):
         """
         Ensures the correct number of characters from the right were mapped
         :param source:
@@ -397,9 +414,9 @@ class Helper(object):
         :param number:
         :return:
         """
-        self.tester.assertEqual(source.str[-number:], target)
+        self.assertEqual(source.str[-number:], target)
 
-    def test_substring(self, source: pd.Series, target: pd.Series, start: int, length: int):
+    def substring_test(self, source: pd.Series, target: pd.Series, start: int, length: int):
         """
         Ensures the correct substring was pulled from each row
         :param source:
@@ -408,9 +425,9 @@ class Helper(object):
         :param length:
         :return:
         """
-        self.tester.assertEqual(source.str[start:length + start], target)
+        self.assertEqual(source.str[start:length + start], target)
 
-    def test_split(self, source: pd.Series, target: pd.Series, split_point: str, part: int):
+    def split_test(self, source: pd.Series, target: pd.Series, split_point: str, part: int):
         """
         Ensures the correct split was made and the resulting data is correct
         :param source:
@@ -420,9 +437,9 @@ class Helper(object):
         :return:
         """
         for sfield, tfield in zip(source, target):
-            self.tester.assertEqual(sfield.split(split_point)[part], tfield)
+            self.assertEqual(sfield.split(split_point)[part], tfield)
 
-    def test_conditional_value(self, source: pd.Series, target: pd.Series, oper: str, if_value,
+    def conditional_value_test(self, source: pd.Series, target: pd.Series, oper: str, if_value,
                                then_value, else_value):
         """
         Ensures that the conditional value evaluates correctly in each row of the column
@@ -437,28 +454,28 @@ class Helper(object):
         for sfield, tfield in zip(source, target):
             if oper == "==":
                 if sfield == if_value:
-                    self.tester.assertEqual(then_value, tfield)
+                    self.assertEqual(then_value, tfield)
                 else:
-                    self.tester.assertEqual(else_value, tfield)
+                    self.assertEqual(else_value, tfield)
             elif oper == "!'":
                 if sfield != if_value:
-                    self.tester.assertEqual(then_value, tfield)
+                    self.assertEqual(then_value, tfield)
                 else:
-                    self.tester.assertEqual(else_value, tfield)
+                    self.assertEqual(else_value, tfield)
             elif oper == "<":
                 if sfield < if_value:
-                    self.tester.assertEqual(then_value, tfield)
+                    self.assertEqual(then_value, tfield)
                 else:
-                    self.tester.assertEqual(else_value, tfield)
+                    self.assertEqual(else_value, tfield)
             elif oper == ">":
                 if sfield > if_value:
-                    self.tester.assertEqual(then_value, tfield)
+                    self.assertEqual(then_value, tfield)
                 else:
-                    self.tester.assertEqual(else_value, tfield)
+                    self.assertEqual(else_value, tfield)
             else:
-                self.tester.assertIn(oper, ["==", "!=", "<", ">"])
+                self.assertIn(oper, ["==", "!=", "<", ">"])
 
-    def test_domain_map(self, source: pd.Series, target: pd.Series, mappings: dict):
+    def domain_map_test(self, source: pd.Series, target: pd.Series, mappings: dict):
         """
         Ensures the domain map pairings are correctly mapped in the target column
         :param self:
@@ -469,31 +486,21 @@ class Helper(object):
         """
         for s, t in zip(source, target):
             if s in mappings:
-                self.tester.assertEqual(mappings[s], t)
+                self.assertEqual(mappings[s], t)
 
     def test_xml(self):
         """
         Tests to see that the newly created xml file is equal to a pre-determined correct file
         :return:
         """
+        if self.testObject.title != "Config":
+            return
         out_xml = ET.parse(self.outXML).getroot()
         correct_xml = ET.parse(self.correctXML).getroot()
-        self.tester.assertTrue(xml_compare(out_xml, correct_xml))
+        self.assertTrue(xml_compare(out_xml, correct_xml))
 
-    def main(self):
-        """
-        Runs all of the tests for the specified object
-        :return:
-        """
-        self.test_length()
-        self.test_fields()
-        if self.testObject.title == "CreateConfig":
-            self.test_data()
-            self.test_xml()
-        elif self.testObject.title in ["Preview", "Stage", "Append"]:
-            self.test_data()
-        elif self.testObject.title == "Replace":
-            self.test_replace_data()
+    def main(self, to, lw, tc):
+        unittest.main()
 
 
 class SourceTargetParser(object):
@@ -522,6 +529,13 @@ class SourceTargetParser(object):
             sourceName = field.find('SourceName').text
             sourcefields.append(sourceName)
         return sourcefields
+
+    def get_data(self):
+        """
+        Returns the xml data
+        :return: dict
+        """
+        return self.Data
 
     @functools.lru_cache()
     def get_targetfields(self):

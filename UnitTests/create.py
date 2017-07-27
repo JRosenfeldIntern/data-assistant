@@ -24,6 +24,12 @@ class BaseClass(object):
         self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
         self.title = self.__class__.__name__
 
+    def main(self) -> object:
+        """
+        Will run the specific test script before any tests are done
+        :return: bool
+        """
+        return True
 
 class CreateConfig(BaseClass):
     """
@@ -80,14 +86,14 @@ class Preview(BaseClass):
 
     def __init__(self, lw, tc, rl=100):
         super().__init__(lw, tc)
-        self.rowLimit = rl
+        self.RowLimit = rl
 
     def main(self):
         """
         Creates a preview feature class in dla.gdb for testing
         :return: None or False
         """
-        dlaPreview.rowLimit = self.rowLimit
+        dlaPreview.rowLimit = self.RowLimit
         return dlaPreview.preview(self.xmlLocation)  # creates the new feature class
 
 
