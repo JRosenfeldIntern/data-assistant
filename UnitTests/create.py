@@ -18,8 +18,9 @@ class BaseClass(object):
     Class used for inheritance that contains basic common information
     """
     def __init__(self, lw, tc):
-        self.localWorkspace = lw
-        self.TestCase = tc
+        self.local_workspace = lw
+        self.test_case = tc
+        self.RowLimit = 0
         self.xmlLocation = tc["xmlLocation"]
         self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
         self.title = self.__class__.__name__

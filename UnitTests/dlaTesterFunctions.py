@@ -136,34 +136,28 @@ class Helper(unittest.TestCase):
     Class designed to run all of the tests for any test object, whether it be Preview, Stage, Append, or Replace
     """
 
-    def __init__(self,test_object, lw: dict, tc: dict):
+    def __init__(self, test_object, local_workspace: dict, test_case: dict):
         self.testObject = test_object
-        self.local_workspace = lw
-        self.test_case = tc
+        self.local_workspace = local_workspace
+        self.test_case = test_case
         self.localDirectory = _outputDirectory
-        self.sourceWorkspace = lw["Source"]
-        self.targetWorkspace = lw["Target"]
-        self.sourceFC = lw["SourceName"]
-        self.targetFC = lw["TargetName"]
+        self.sourceWorkspace = local_workspace["Source"]
+        self.targetWorkspace = local_workspace["Target"]
+        self.sourceFC = local_workspace["SourceName"]
+        self.targetFC = local_workspace["TargetName"]
         arcpy.env.workspace = self.localDirectory
         self.localFC = arcpy.ListFeatureClasses()[0]
         arcpy.env.workspace = ""
         self.localDataPath = os.path.join(_outputDirectory, self.localFC)
         self.localFields = tuple(arcpy.ListFields(self.localDataPath))
-        self.sourceDataPath = os.path.join(lw["Source"], lw["SourceName"])
-        self.targetDataPath = os.path.join(lw["Target"], lw["TargetName"])
+        self.sourceDataPath = os.path.join(local_workspace["Source"], local_workspace["SourceName"])
+        self.targetDataPath = os.path.join(local_workspace["Target"], local_workspace["TargetName"])
         self.sourceFields = tuple(arcpy.ListFields(self.sourceDataPath))
         self.targetFields = tuple(arcpy.ListFields(self.targetDataPath))
         self.methods = _XMLMethodNames
         self.xmlLocation = self.test_case["xmlLocation"]
-        self.outXML = tc["outXML"]
-        self.correctXML = tc["correctXML"]
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
+        self.outXML = test_case["outXML"]
+        self.correctXML = test_case["correctXML"]
 
     @staticmethod
     @functools.lru_cache()
