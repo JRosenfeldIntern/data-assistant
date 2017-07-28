@@ -42,15 +42,14 @@ def build_correct_fields(xml_location: str, include_globalID: bool):
     return correct_fields
 
 
-def make_copy(directory: str):
+def make_copy(directory: str, local_workspace: dict, test_case: dict):
     """
     Copies the target feature class into the dla.gdb for comparison in the tests
     :param directory:  str
     :return:
     """
-    clear_feature_classes(directory)  # creating a copy of the target feature class
-    arcpy.env.workspace = _localWorkspace["Target"]  # to compare to after append
-    arcpy.CopyFeatures_management("Target", os.path.join(directory, "copy"))
+    arcpy.env.workspace = local_workspace["Target"]
+    arcpy.CopyFeatures_management(test_case["TargetName"], os.path.join(directory, "copy"))
 
 
 def restore_data():

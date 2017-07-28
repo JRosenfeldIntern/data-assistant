@@ -1,28 +1,24 @@
 import os
 import shutil
 
-import arcpy
-
-import dla
 import dlaCreateSourceTarget
 import dlaPreview
 import dlaPublish
 import dlaStage
-import dlaTesterFunctions
+import test_All
 from inc_datasources import _outputDirectory
-import dla
 
 
 class BaseClass(object):
     """
     Class used for inheritance that contains basic common information
     """
-    def __init__(self, lw, tc):
+
+    def __init__(self, lw):
         self.local_workspace = lw
-        self.test_case = tc
         self.RowLimit = 0
-        self.xmlLocation = tc["xmlLocation"]
-        self.globalIDCheck = False # self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
+        self.xmlLocation = lw["xmlLocation"]
+        self.globalIDCheck = False  # self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
         self.title = self.__class__.__name__
 
     def main(self) -> object:
@@ -32,13 +28,14 @@ class BaseClass(object):
         """
         return True
 
+
 class CreateConfig(BaseClass):
     """
     A class that is designed to create and house information to test dlaCreateSourceTarget
     """
 
-    def __init__(self, lw, tc):
-        super().__init__(lw, tc)
+    def __init__(self, lw: list):
+        super().__init__(lw)
 
     # def importUtilNetworkToolbox():
     #     parentPath = os.path.join(str(pathlib.Path(__file__).parents[1]), 'UtilityNetworkConfigurationTools')
@@ -73,11 +70,11 @@ class CreateConfig(BaseClass):
         Runs the initial action of the test and returns it
         :return: boolean
         """
-        source_path = dla.getLayerPath(os.path.join(self.localWorkspace["Source"], self.localWorkspace["SourceName"]))
-        target_path = dla.getLayerPath(os.path.join(self.xmlLocation["Target"], self.localWorkspace["TargetName"]))
+        source_path = os.path.join(self.local_workspace["Source"], self.local_workspace["SourceName"])
+        target_path = os.path.join(self.local_workspace["Target"], self.local_workspace["TargetName"])
         field_matcher = os.path.dirname(os.path.realpath(__file__))
-        shutil.copy(self.TestCase["MatchLibrary"], field_matcher)
-        return dlaCreateSourceTarget.createDlaFile(source_path, target_path, self.xmlLocation)
+        shutil.copy(self.local_workspace["MatchLibrary"], field_matcher)
+        return dlaCreateSourceTarget.createDlaFile(source_path, target_path, self.local_workspace["outXML"])
 
 
 class Preview(BaseClass):
@@ -85,8 +82,8 @@ class Preview(BaseClass):
     A class that is designed to create and house information to test dlaPreview
     """
 
-    def __init__(self, lw, tc, rl=100):
-        super().__init__(lw, tc)
+    def __init__(self, lw, rl=100):
+        super().__init__(lw)
         self.RowLimit = rl
 
     def main(self):
@@ -103,8 +100,8 @@ class Stage(BaseClass):
     A class that is designed to create and house information to test dlaStage
     """
 
-    def __init__(self, lw, tc):
-        super().__init__(lw, tc)
+    def __init__(self, lw):
+        super().__init__(lw)
 
     def main(self):
         """
@@ -119,8 +116,8 @@ class Append(BaseClass):
     A class that is designed to create and house information to test dlaAppend
     """
 
-    def __init__(self, lw: dict, tc: dict):
-        super().__init__(lw, tc)
+    def __init__(self, lw: dict):
+        super().__init__(lw)
         self.directory = _outputDirectory
 
     def main(self):
@@ -129,7 +126,7 @@ class Append(BaseClass):
         onto the end of target for testing
         :return:
         """
-        dlaTesterFunctions.make_copy(self.directory)
+        test_All.make_copy(self.directory, self.local_workspace)
         dlaPublish._useReplaceSettings = False
         return dlaPublish.publish(self.xmlLocation)
 
@@ -139,8 +136,8 @@ class Replace(BaseClass):
     A class that is designed to create and house information to test dlaReplaceByField
     """
 
-    def __init__(self, lw: dict, tc: dict):
-        super().__init__(lw, tc)
+    def __init__(self, lw: dict):
+        super().__init__(lw)
         self.directory = _outputDirectory
 
     def main(self):
@@ -148,6 +145,6 @@ class Replace(BaseClass):
         Applys the ReplaceByField operation specified in the xml file to the data for testing
         :return: None or False
         """
-        dlaTesterFunctions.make_copy(self.directory)
+        test_All.make_copy(self.directory, self.local_workspace)
         dlaPublish._useReplaceSettings = True
         return dlaPublish.publish(self.xmlLocation)

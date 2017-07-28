@@ -1,5 +1,4 @@
 import functools
-import os
 import pathlib
 import sys
 import unittest
@@ -8,11 +7,11 @@ import zipfile
 
 import arcpy
 import pandas as pd
-
-import create
+import tempfile
 import dla
+from create import *
 from dlaTesterFunctions import SourceTargetParser
-from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools, _configMatrix
+from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
 
 sys.path.insert(0, _daGPTools)
 
@@ -45,15 +44,15 @@ def build_correct_fields(xml_location: str, include_globalid: bool = False):
     return correct_fields
 
 
-def make_copy(directory: str):
+def make_copy(directory: str, lw: dict):
     """
     Copies the target feature class into the dla.gdb for comparison in the tests
     :param directory:  str
+    :param lw : dict
     :return:
     """
-    clear_feature_classes(directory)  # creating a copy of the target feature class
-    arcpy.env.workspace = _localWorkspace["Target"]  # to compare to after append
-    arcpy.CopyFeatures_management("Target", os.path.join(directory, "copy"))
+    arcpy.env.workspace = lw["Target"]
+    arcpy.CopyFeatures_management(lw["TargetName"], os.path.join(directory, "copy"))
 
 
 def restore_data():
@@ -64,7 +63,7 @@ def restore_data():
     workspace = str(pathlib.Path(".\localData").absolute())
     for file in os.listdir(workspace):
         if ".zip" in file:
-            with zipfile.ZipFile(file) as unzipper:
+            with zipfile.ZipFile(os.path.join(workspace, file)) as unzipper:
                 unzipper.extractall(workspace)  # TODO: change workspace here to the address to a temp folder
 
 
@@ -139,30 +138,27 @@ class UnitTests(unittest.TestCase):
     Runs the unit tests for the various functions for all test cases and data sources
     """
 
-    def __init__(self, test_object: create.BaseClass, *args, **kwargs):
+    def __init__(self, test_object, *args, **kwargs):
         super(UnitTests, self).__init__(*args, **kwargs)
 
         self.testObject = test_object
         self.local_workspace = self.testObject.local_workspace
-        self.test_case = self.testObject.test_case
         self.localDirectory = _outputDirectory
         self.sourceWorkspace = self.local_workspace["Source"]
         self.targetWorkspace = self.local_workspace["Target"]
         self.sourceFC = self.local_workspace["SourceName"]
         self.targetFC = self.local_workspace["TargetName"]
-        arcpy.env.workspace = self.localDirectory  # TODO: Workaround for create_config
-        self.localFC = arcpy.ListFeatureClasses()[0]
-        arcpy.env.workspace = ""
-        self.localDataPath = os.path.join(_outputDirectory, self.localFC)
-        self.localFields = tuple(arcpy.ListFields(self.localDataPath))
+        self.localFC = list()
+        self.localDataPath = ""
+        self.localFields = tuple()
         self.sourceDataPath = os.path.join(self.local_workspace["Source"], self.local_workspace["SourceName"])
         self.targetDataPath = os.path.join(self.local_workspace["Target"], self.local_workspace["TargetName"])
         self.sourceFields = tuple(arcpy.ListFields(self.sourceDataPath))
         self.targetFields = tuple(arcpy.ListFields(self.targetDataPath))
         self.methods = _XMLMethodNames
-        self.xmlLocation = self.test_case["xmlLocation"]
-        self.outXML = self.test_case["outXML"]
-        self.correctXML = self.test_case["correctXML"]
+        self.xmlLocation = self.local_workspace["xmlLocation"]
+        self.outXML = self.local_workspace["outXML"]
+        self.correctXML = self.local_workspace["correctXML"]
 
     # TODO: We want this function to run first, but unit tests should be monolithic. Might need to have a workaround
     def test_create(self):
@@ -170,7 +166,21 @@ class UnitTests(unittest.TestCase):
         Creates the feature class or xml file for testing
         :return:
         """
+        clear_feature_classes(_outputDirectory)
         self.testObject.main()
+        if self.testObject.title != "CreateConfig":
+            self.set_local_info()
+
+    def set_local_info(self):
+        """
+        Once the feature class being tested is created, sets the datapath and fields of that feature class
+        :return:
+        """
+        arcpy.env.workspace = self.localDirectory  # TODO: Workaround for create_config
+        self.localFC = arcpy.ListFeatureClasses()[0]
+        arcpy.env.workspace = ""
+        self.localDataPath = os.path.join(_outputDirectory, self.localFC)
+        self.localFields = tuple(arcpy.ListFields(self.localDataPath))
 
     @staticmethod
     @functools.lru_cache()
@@ -227,7 +237,7 @@ class UnitTests(unittest.TestCase):
         if self.testObject.title not in ["Preview", "Stage", "Append", "Replace"]:
             return
         source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
-        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.targetFields]))
+        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.localFields]))
         target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
         mode = self.testObject.title  # variable assignment to help with readability
         if mode == "Preview":
@@ -282,7 +292,7 @@ class UnitTests(unittest.TestCase):
         if self.testObject.title not in ["Preview", "Stage", "Append"]:
             return
         source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
-        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.targetFields]))
+        local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.localFields]))
         target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
         parse_object = self.get_xml_parse()
         parse_object.data = parse_object.parse()
@@ -293,9 +303,8 @@ class UnitTests(unittest.TestCase):
         if self.testObject.title in ["Preview", "Stage"]:  # needed so that we can use the same function to test append
             target = local_table
         else:
-            self.assertEqual(target_table.iloc[:len(local_table)],
-                             local_table)  # TODO: Currently throws error about incompatable data frames
-            target = target_table.iloc[len(local_table):]  # ensures we are only comparing the newly appended data
+            self.assertTrue(local_table.equals(target_table.head(len(local_table))))
+            target = target_table.head(len(local_table))  # ensures we are only comparing the newly appended data
 
         for field in xml_fields.keys():
             if method_dict[field] == self.methods["None"]:
@@ -328,7 +337,8 @@ class UnitTests(unittest.TestCase):
                                             xml_data[field]["Oper"], xml_data[field]["If"], xml_data[field]["Then"],
                                             xml_data[field]["Else"])
             elif method_dict[field] == self.methods["Domain Map"]:
-                self.domain_map_test(source_table[xml_fields[field]], target[field], xml_data[field][self.methods["Domain Map"]])
+                self.domain_map_test(source_table[xml_fields[field]], target[field],
+                                     xml_data[field][self.methods["Domain Map"]])
             else:
                 self.assertIn(method_dict[field], self.methods)
 
@@ -518,10 +528,15 @@ class UnitTests(unittest.TestCase):
         Runs all of the tests
         :return:
         """
-        # self.test_create()
-        self.test_fields()
-        self.test_length()
-        self.test_data()
+        if self.testObject.title == "CreateConfig":
+            self.test_create()
+            self.test_xml()
+            return
+        else:
+            self.test_create()
+            self.test_fields()
+            self.test_length()
+            self.test_data()
 
 
 class SourceTargetParser(object):
@@ -684,19 +699,62 @@ class SourceTargetParser(object):
         return data
 
 
+def make_temp_file() -> tempfile.TemporaryDirectory:
+    """
+    Returns a temporary directory that is used to store the local data for the tests
+    :return:
+    """
+    localfolder = str(pathlib.Path(".\localData").absolute())
+    return tempfile.TemporaryDirectory(dir=localfolder)
+
+
+def change_workspace(lw: list, tmp_name: str) -> list:
+    """
+    Changes the data paths to reflect the new temporary file made
+    :param lw: list
+    :param tmp_name: str
+    :return:
+    """
+    out_workspace = lw.copy()
+    for workspace in out_workspace:
+        the_path = ""
+        for part in pathlib.Path(workspace["Source"]).parts:
+            the_path = os.path.join(the_path, part)
+            if part == 'localData':
+                the_path = os.path.join(the_path, tmp_name)
+        workspace["Source"] = the_path
+
+        the_path = ""
+        for part in pathlib.Path(workspace["Target"]).parts:
+            the_path = os.path.join(the_path, part)
+            if part == 'localData':
+                the_path = os.path.join(the_path, tmp_name)
+        workspace["Target"] = the_path
+
+    return out_workspace
+
+
+def set_up_data(tmpdir: str):
+    """
+    Unzips all data into local directory
+    :param tmpdir:
+    :return:
+    """
+    workspace = str(pathlib.Path(".\localData").absolute())
+    for file in os.listdir(workspace):
+        if ".zip" in file:
+            with zipfile.ZipFile(os.path.join(workspace, file)) as unzipper:
+                unzipper.extractall(tmpdir)
+
 if __name__ == '__main__':
-    for test_case, local_workspace in zip(_configMatrix, _localWorkspace):
-        # suite = unittest.TestSuite()
-        # suite.addTest(UnitTests(create.CreateConfig(local_workspace, test_case)))  # TODO: Proof of concept, fix syntax
-        # suite.addTest(UnitTests(create.Preview(local_workspace, test_case)))
-        # suite.addTest(UnitTests(create.Stage(local_workspace, test_case)))
-        # suite.addTest(UnitTests(create.Append(local_workspace, test_case)))
-        # suite.addTest(UnitTests(create.Replace(local_workspace, test_case)))
-        # clear_feature_classes(_outputDirectory)
-        preview = create.Preview(local_workspace, test_case)
-        preview.main()
-        UnitTests(preview).main()
+    tmp = make_temp_file()
+    temp_workspace = change_workspace(_localWorkspace, pathlib.Path(tmp.name).stem)
+    set_up_data(tmp.name)
 
-        runner = unittest.TextTestRunner()
+    # for local_workspace in temp_workspace:
+        # UnitTests(create.CreateConfig(local_workspace)).main()
+        # UnitTests(create.Preview(local_workspace)).main()
+        # UnitTests(create.Stage(local_workspace)).main()
+        # UnitTests(Append(local_workspace)).main()
 
-        # restore_data()
+    #restore_data()

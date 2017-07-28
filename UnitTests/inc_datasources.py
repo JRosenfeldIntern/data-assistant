@@ -15,37 +15,17 @@ _localWorkspace.append(
      "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
      "SourceName": "source",
      "TargetName": "Target",
-     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute())})  # might not need
+     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute()),
+     "xmlLocation": os.path.join(_localOutputPath, "GDB_to_GDB.xml"),
+     "outXML": os.path.join(_localOutputPath, "test_GDB.xml"),
+     "correctXML": str(pathlib.Path(r".\testOutput\correctXML\GDB\correct_GDB.xml").absolute()),
+     "MatchLibrary": str(pathlib.Path(r".\testOutput\correctXML\GDB\MatchLocal.xml").absolute())
+     })  # might not need
 # _localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
 #                       "Target":str(pathlib.Path(".\localData").absolute()),
 #                        "SourceName":"source.lyrx",
 #                        "TargetName":"Target.lyrx"})
 
-
-# DB Connection
-_dbConnStr = list()
-_dbConnStr.append({"title": "GDB Source",
-                   "dataPath": str(pathlib.Path(".\localData\WaterDataMigration.gdb\source").absolute())})
-_dbConnStr.append({"title": "GDB Target",
-                   "dataPath": str(pathlib.Path(".\localData\WaterDataMigration.gdb\Target").absolute())})
-
-_dbConnStr.append({"title": "Layer Source",
-                   "dataPath": str(pathlib.Path(".\localData\source.lyrx").absolute())})
-_dbConnStr.append({"title": "Layer Target",
-                   "dataPath": str(pathlib.Path(".\localData\Target.lyrx").absolute())})
-
-########### Source and Target Matrix ##########
-_configMatrix = list()
-_configMatrix.append({"Source": _dbConnStr[0],
-                      "Target": _dbConnStr[1],
-                      "xmlLocation": os.path.join(_localOutputPath, "GDB_to_GDB.xml"),
-                      "outXML": os.path.join(_localOutputPath, "test_GDB.xml"),
-                      "correctXML": str(pathlib.Path(r".\testOutput\correctXML\GDB\correct_GDB.xml").absolute()),
-                      "MatchLibrary": str(pathlib.Path(r".\testOutput\correctXML\GDB\MatchLocal.xml").absolute())})
-# _configMatrix.append({"Source":_dbConnStr[2],
-#                      "Target":_dbConnStr[3],
-#                      "xmlLocation":os.path.join(_localOutputPath,"lyrx_to_lyrx.xml"),
-#                      "outXML":os.path.join(_localOutputPath,"test_lyrx.xml")})
 
 
 ########## XML Syntax ############
