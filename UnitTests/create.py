@@ -22,7 +22,7 @@ class BaseClass(object):
         self.test_case = tc
         self.RowLimit = 0
         self.xmlLocation = tc["xmlLocation"]
-        self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
+        self.globalIDCheck = False # self.globalIDCheck = dla.processGlobalIds(dla.getXmlDoc(self.xmlLocation))
         self.title = self.__class__.__name__
 
     def main(self) -> object:
