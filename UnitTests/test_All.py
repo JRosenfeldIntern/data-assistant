@@ -4,16 +4,15 @@ import sys
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
-
+from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
+sys.path.insert(0, _daGPTools)
 import arcpy
 import pandas as pd
 import tempfile
 import dla
 from create import *
-from dlaTesterFunctions import SourceTargetParser
-from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
 
-sys.path.insert(0, _daGPTools)
+
 
 
 def clear_feature_classes(directory: str):
@@ -746,14 +745,33 @@ def set_up_data(tmpdir: str):
             with zipfile.ZipFile(os.path.join(workspace, file)) as unzipper:
                 unzipper.extractall(tmpdir)
 
+
+def change_xml_path(t_workspace: list):
+    """
+    Changes the source and target path in the xml files for testing
+    :param t_workspace:
+    :return:
+    """
+    for workspace in t_workspace:  # TODO: Actually change the xml, not the ET representing the xml
+        xml = ET.parse(workspace["xmlLocation"])
+        root = xml.getroot()
+        datasets = root.find('Datasets').getchildren()
+        for field in datasets:
+            if field.tag == "Source":
+                field.text = workspace["Source"]
+            if field.tag == "Target":
+                field.text = workspace["Target"]
+        xml.write(workspace["xmlLocation"])
+
 if __name__ == '__main__':
     tmp = make_temp_file()
     temp_workspace = change_workspace(_localWorkspace, pathlib.Path(tmp.name).stem)
     set_up_data(tmp.name)
+    change_xml_path(temp_workspace)
 
-    # for local_workspace in temp_workspace:
-        # UnitTests(create.CreateConfig(local_workspace)).main()
-        # UnitTests(create.Preview(local_workspace)).main()
+    for local_workspace in temp_workspace:
+        # UnitTests(CreateConfig(local_workspace)).main()
+        UnitTests(Preview(local_workspace)).main()
         # UnitTests(create.Stage(local_workspace)).main()
         # UnitTests(Append(local_workspace)).main()
 

@@ -1,8 +1,8 @@
-<?xml version="1.0" ?><SourceTargetMatrix version="1.1" xmlns:esri="http://www.esri.com">
+<SourceTargetMatrix version="1.1">
   <Datasets>
     <Project>C:\Users\josh9173\Documents\ArcGIS\Projects\MyProject1\MyProject1.aprx</Project>
-    <Source>C:\Users\josh9173\Documents\GitHub\data-assistant\UnitTests\localData\WaterDataMigration.gdb\source</Source>
-    <Target>C:\Users\josh9173\Documents\GitHub\data-assistant\UnitTests\localData\WaterDataMigration.gdb\Target</Target>
+    <Source>C:\Users\josh9173\Documents\GitHub\data-assistant\UnitTests\localData\tmp67_8eofm\WaterDataMigration.gdb</Source>
+    <Target>C:\Users\josh9173\Documents\GitHub\data-assistant\UnitTests\localData\tmp67_8eofm\WaterDataMigration.gdb</Target>
     <SourceSpatialReference>PROJCS['NAD_1983_HARN_StatePlane_Illinois_East_FIPS_1201',GEOGCS['GCS_North_American_1983_HARN',DATUM['D_North_American_1983_HARN',SPHEROID['GRS_1980',6378137.0,298.257222101]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',984250.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',-88.33333333333333],PARAMETER['Scale_Factor',0.999975],PARAMETER['Latitude_Of_Origin',36.66666666666666],UNIT['Foot_US',0.3048006096012192]],VERTCS['NAVD_1988',VDATUM['North_American_Vertical_Datum_1988'],PARAMETER['Vertical_Shift',0.0],PARAMETER['Direction',1.0],UNIT['Meter',1.0]];-17463800 -46132600 3048.00609601219;-100000 10000;-100000 10000;3.28083333333333E-03;0.001;0.001;IsHighPrecision</SourceSpatialReference>
     <TargetSpatialReference>PROJCS['NAD_1983_HARN_StatePlane_Illinois_East_FIPS_1201',GEOGCS['GCS_North_American_1983_HARN',DATUM['D_North_American_1983_HARN',SPHEROID['GRS_1980',6378137.0,298.257222101]],PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]],PROJECTION['Transverse_Mercator'],PARAMETER['False_Easting',984250.0],PARAMETER['False_Northing',0.0],PARAMETER['Central_Meridian',-88.33333333333333],PARAMETER['Scale_Factor',0.999975],PARAMETER['Latitude_Of_Origin',36.66666666666666],UNIT['Foot_US',0.3048006096012192]],VERTCS['NAVD_1988',VDATUM['North_American_Vertical_Datum_1988'],PARAMETER['Vertical_Shift',0.0],PARAMETER['Direction',1.0],UNIT['Meter',1.0]];-17463800 -46132600 3048.00609601219;-100000 10000;-100000 10000;3.28083333333333E-03;0.001;0.001;IsHighPrecision</TargetSpatialReference>
     <ReplaceBy>
@@ -67,42 +67,42 @@
     </Field>
   </Fields>
   <SourceFields>
-    <SourceField Name="(None)"/>
-    <SourceField AliasName="Facility ID" Length="20" Name="FACILITYID" Type="String"/>
-    <SourceField AliasName="Install Date" Length="8" Name="INSTALLDATE" Type="Date"/>
-    <SourceField AliasName="Diameter" Length="8" Name="DIAMETER" Type="Double"/>
-    <SourceField AliasName="Material" Length="20" Name="MATERIAL" Type="String"/>
-    <SourceField AliasName="Recorded Length" Length="8" Name="RECORDLENG" Type="Double"/>
-    <SourceField AliasName="Active Flag" Length="2" Name="ACTIVEFLAG" Type="SmallInteger"/>
-    <SourceField AliasName="Owned By" Length="2" Name="OWNEDBY" Type="SmallInteger"/>
-    <SourceField AliasName="Managed By" Length="2" Name="MAINTBY" Type="SmallInteger"/>
-    <SourceField AliasName="Last Update Date" Length="8" Name="LASTUPDATE" Type="Date"/>
-    <SourceField AliasName="Last Editor" Length="50" Name="LASTEDITOR" Type="String"/>
-    <SourceField AliasName="GlobalID" Length="38" Name="GlobalID" Type="GlobalID"/>
+    <SourceField Name="(None)" />
+    <SourceField AliasName="Facility ID" Length="20" Name="FACILITYID" Type="String" />
+    <SourceField AliasName="Install Date" Length="8" Name="INSTALLDATE" Type="Date" />
+    <SourceField AliasName="Diameter" Length="8" Name="DIAMETER" Type="Double" />
+    <SourceField AliasName="Material" Length="20" Name="MATERIAL" Type="String" />
+    <SourceField AliasName="Recorded Length" Length="8" Name="RECORDLENG" Type="Double" />
+    <SourceField AliasName="Active Flag" Length="2" Name="ACTIVEFLAG" Type="SmallInteger" />
+    <SourceField AliasName="Owned By" Length="2" Name="OWNEDBY" Type="SmallInteger" />
+    <SourceField AliasName="Managed By" Length="2" Name="MAINTBY" Type="SmallInteger" />
+    <SourceField AliasName="Last Update Date" Length="8" Name="LASTUPDATE" Type="Date" />
+    <SourceField AliasName="Last Editor" Length="50" Name="LASTEDITOR" Type="String" />
+    <SourceField AliasName="GlobalID" Length="38" Name="GlobalID" Type="GlobalID" />
   </SourceFields>
   <TargetFields>
-    <TargetField AliasName="Asset group" Length="4" Name="ASSETGROUP" Type="Integer"/>
-    <TargetField AliasName="Asset type" Length="2" Name="ASSETTYPE" Type="SmallInteger"/>
-    <TargetField AliasName="Containment status" Length="2" Name="CONTAINMENTSTATUS" Type="SmallInteger"/>
-    <TargetField AliasName="Subnetwork name" Length="2000" Name="SUBNETWORKNAME" Type="String"/>
-    <TargetField AliasName="Creation date" Length="8" Name="CREATIONDATE" Type="Date"/>
-    <TargetField AliasName="Creator" Length="255" Name="CREATOR" Type="String"/>
-    <TargetField AliasName="Last update" Length="8" Name="LASTUPDATE" Type="Date"/>
-    <TargetField AliasName="Updated by" Length="255" Name="UPDATEDBY" Type="String"/>
-    <TargetField AliasName="Material" Length="10" Name="material" Type="String"/>
-    <TargetField AliasName="Measured Length" Length="8" Name="measuredlength" Type="Double"/>
-    <TargetField AliasName="Asset ID" Length="50" Name="assetid" Type="String"/>
+    <TargetField AliasName="Asset group" Length="4" Name="ASSETGROUP" Type="Integer" />
+    <TargetField AliasName="Asset type" Length="2" Name="ASSETTYPE" Type="SmallInteger" />
+    <TargetField AliasName="Containment status" Length="2" Name="CONTAINMENTSTATUS" Type="SmallInteger" />
+    <TargetField AliasName="Subnetwork name" Length="2000" Name="SUBNETWORKNAME" Type="String" />
+    <TargetField AliasName="Creation date" Length="8" Name="CREATIONDATE" Type="Date" />
+    <TargetField AliasName="Creator" Length="255" Name="CREATOR" Type="String" />
+    <TargetField AliasName="Last update" Length="8" Name="LASTUPDATE" Type="Date" />
+    <TargetField AliasName="Updated by" Length="255" Name="UPDATEDBY" Type="String" />
+    <TargetField AliasName="Material" Length="10" Name="material" Type="String" />
+    <TargetField AliasName="Measured Length" Length="8" Name="measuredlength" Type="Double" />
+    <TargetField AliasName="Asset ID" Length="50" Name="assetid" Type="String" />
   </TargetFields>
   <Data>
-    <Row ACTIVEFLAG="1" DIAMETER="10.0" FACILITYID="10001" GlobalID="{20A32CB6-1A3A-4BBC-A307-5CD101E747FF}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="50.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="20.0" FACILITYID="10004" GlobalID="{2AE82F07-9744-433A-B736-EEF453D0DD13}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None"/>
-    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10005" GlobalID="{CC24D70B-7170-434E-A33E-7F85246CCCB3}" INSTALLDATE="2004-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2017-01-04 13:54:51.000001" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None"/>
-    <Row ACTIVEFLAG="1" DIAMETER="16.0" FACILITYID="24199" GlobalID="{9FC112EF-07B7-4F9E-99D5-5BFFC012F3E3}" INSTALLDATE="1988-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="40.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10002" GlobalID="{3375FE77-211A-41A9-AAB5-380DE913E25D}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2017-01-04 13:54:21" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="75.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="20.0" FACILITYID="10006" GlobalID="{B8911197-0AA2-42D9-8D0D-56A1C1C0CD19}" INSTALLDATE="2008-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None"/>
-    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10008" GlobalID="{117DAFEC-C3B7-4345-B0F9-D58BC4F4555D}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="40.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="10.0" FACILITYID="10000" GlobalID="{A7D7554F-7038-4D47-A7A2-C33808DF9CE5}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="30.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="98436" GlobalID="{2CA75581-F67A-4D83-881A-8138DA7DBA33}" INSTALLDATE="1966-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="CP" OWNEDBY="1" RECORDLENG="20.0"/>
-    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="98429" GlobalID="{C28890A7-3C5B-43A4-9799-FE88B5024B3F}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="CP" OWNEDBY="1" RECORDLENG="20.0"/>
+    <Row ACTIVEFLAG="1" DIAMETER="10.0" FACILITYID="10001" GlobalID="{20A32CB6-1A3A-4BBC-A307-5CD101E747FF}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="50.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="20.0" FACILITYID="10004" GlobalID="{2AE82F07-9744-433A-B736-EEF453D0DD13}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None" />
+    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10005" GlobalID="{CC24D70B-7170-434E-A33E-7F85246CCCB3}" INSTALLDATE="2004-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2017-01-04 13:54:51.000001" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None" />
+    <Row ACTIVEFLAG="1" DIAMETER="16.0" FACILITYID="24199" GlobalID="{9FC112EF-07B7-4F9E-99D5-5BFFC012F3E3}" INSTALLDATE="1988-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="40.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10002" GlobalID="{3375FE77-211A-41A9-AAB5-380DE913E25D}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2017-01-04 13:54:21" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="75.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="20.0" FACILITYID="10006" GlobalID="{B8911197-0AA2-42D9-8D0D-56A1C1C0CD19}" INSTALLDATE="2008-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="None" />
+    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="10008" GlobalID="{117DAFEC-C3B7-4345-B0F9-D58BC4F4555D}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="40.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="10.0" FACILITYID="10000" GlobalID="{A7D7554F-7038-4D47-A7A2-C33808DF9CE5}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="SP" OWNEDBY="1" RECORDLENG="30.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="98436" GlobalID="{2CA75581-F67A-4D83-881A-8138DA7DBA33}" INSTALLDATE="1966-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="CP" OWNEDBY="1" RECORDLENG="20.0" />
+    <Row ACTIVEFLAG="1" DIAMETER="None" FACILITYID="98429" GlobalID="{C28890A7-3C5B-43A4-9799-FE88B5024B3F}" INSTALLDATE="1900-01-01 00:00:00" LASTEDITOR="Esri" LASTUPDATE="2010-04-20 11:00:50" MAINTBY="1" MATERIAL="CP" OWNEDBY="1" RECORDLENG="20.0" />
   </Data>
 </SourceTargetMatrix>

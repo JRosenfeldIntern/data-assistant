@@ -2,7 +2,7 @@ import os
 import pathlib
 
 # Path to Data Assistant tools
-_daGPTools = r"C:\Users\Win10\AppData\Local\ESRI\ArcGISPro\AssemblyCache\{28142961-b645-420f-ba2a-72bcf8212558}\GPTools\arcpy"
+_daGPTools = str((pathlib.Path(__file__).parents[1]/"Shared\\GPTools\\arcpy").absolute())
 # location for local output
 _localOutputPath = str(pathlib.Path(__file__).parents[0] / 'testOutput')
 _outputDirectory = str(pathlib.Path(__file__).parents[0] / 'dla.gdb')
