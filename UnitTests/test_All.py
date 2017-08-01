@@ -54,18 +54,6 @@ def make_copy(directory: str, lw: dict):
     arcpy.CopyFeatures_management(lw["TargetName"], os.path.join(directory, "copy"))
 
 
-def restore_data():
-    """
-    After the data is replaced or appended, this function will restore the target to the original state
-    :return:
-    """
-    workspace = str(pathlib.Path(".\localData").absolute())
-    for file in os.listdir(workspace):
-        if ".zip" in file:
-            with zipfile.ZipFile(os.path.join(workspace, file)) as unzipper:
-                unzipper.extractall(workspace)  # TODO: change workspace here to the address to a temp folder
-
-
 def xml_compare(x1: ET, x2: ET, reporter=None):
     """
     taken from:
@@ -540,6 +528,20 @@ class UnitTests(unittest.TestCase):
         correct_xml = ET.parse(self.correctXML).getroot()
         self.assertTrue(xml_compare(out_xml, correct_xml))
 
+    def destage(self):
+        """
+        After staging is done, the xml reflects there should be a feature class that append can use to append to source.
+        This function deletes this line in the xml so the xml can be used again or so append can recreate the mapping.
+        :return:
+        """
+        xml = ET.parse(self.xmlLocation)
+        root = xml.getroot()
+        datasets = root.getchildren()[0]
+        staged = datasets.getchildren()[len(datasets.getchildren()) - 1]
+        if staged.tag == "Staged":
+            datasets.remove(staged)
+            xml.write(self.xmlLocation)
+
     def main(self):
         """
         Runs all of the tests
@@ -787,15 +789,21 @@ if __name__ == '__main__':
     temp_workspace = change_workspace(_localWorkspace, pathlib.Path(tmp.name).stem)
     set_up_data(tmp.name)
     change_xml_path(temp_workspace)
-    for local_workspace in temp_workspace:
-        UnitTests(CreateConfig(local_workspace)).main()
-        UnitTests(Preview(local_workspace)).main()
-        UnitTests(Append(local_workspace)).main()
-        UnitTests(Stage(local_workspace)).main()
-
     try:
-        tmp.cleanup()
-    except PermissionError:
-        print("Unable to delete temporary folder: Permission Error")
-        pass
-        # restore_data()
+        for local_workspace in temp_workspace:
+            UnitTests(CreateConfig(local_workspace)).main()
+            UnitTests(Preview(local_workspace)).main()
+            append = UnitTests(Append(local_workspace))
+            append.destage()
+            append.main()
+            stage = UnitTests(Stage(local_workspace))
+            stage.main()
+            stage.destage()
+    except AssertionError as e:
+        print(e)
+    finally:
+        try:
+            tmp.cleanup()
+        except PermissionError:
+            print("Unable to delete temporary folder: Permission Error")
+            pass
