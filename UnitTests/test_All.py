@@ -4,15 +4,15 @@ import sys
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
+
 from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
+
 sys.path.insert(0, _daGPTools)
 import arcpy
 import pandas as pd
 import tempfile
 import dla
 from create import *
-
-
 
 
 def clear_feature_classes(directory: str):
@@ -173,6 +173,16 @@ class UnitTests(unittest.TestCase):
         if self.testObject.title != "CreateConfig":
             self.set_local_info()
 
+    def get_default_values(self):
+        """
+        Returns a dictionary where the key is the field name and the value is that field's default value
+        :return: dict
+        """
+        out_dict = dict()
+        for field in self.targetFields:
+            out_dict[field.name] = field.defaultValue
+        return out_dict
+
     def set_local_info(self):
         """
         Once the feature class being tested is created, sets the datapath and fields of that feature class
@@ -185,16 +195,15 @@ class UnitTests(unittest.TestCase):
         self.localFields = tuple(arcpy.ListFields(self.localDataPath))
 
     @staticmethod
-    @functools.lru_cache()
-    def build_data_frame(directory: str, columns: tuple):
+    def build_data_frame(data_path: str, columns: tuple):
         """
         Builds and caches a pandas DataFrame object containing the information from the specified feature class
-        :param directory: str
+        :param data_path: str
         :param columns: tupe(str)
         :return: pd.DataFrame object
         """
         # creates a searchCursor for a given feature class and returns an array of that table
-        return pd.DataFrame(list(arcpy.da.SearchCursor(directory, columns)), columns=columns)
+        return pd.DataFrame(list(arcpy.da.SearchCursor(data_path, columns)), columns=columns)
 
     @functools.lru_cache()
     def get_xml_parse(self):
@@ -240,6 +249,7 @@ class UnitTests(unittest.TestCase):
             return
         source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
         local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.localFields]))
+        # target_table = (list(arcpy.da.SearchCursor(self.targetDataPath, "*")))
         target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
         mode = self.testObject.title  # variable assignment to help with readability
         if mode == "Preview":
@@ -301,16 +311,20 @@ class UnitTests(unittest.TestCase):
         xml_fields = parse_object.get_pairings()
         method_dict = parse_object.get_methods()
         xml_data = parse_object.get_data()
+        default_values = self.get_default_values()
 
         if self.testObject.title in ["Preview", "Stage"]:  # needed so that we can use the same function to test append
             target = local_table
         else:
-            self.assertTrue(local_table.equals(target_table.head(len(local_table))))
-            target = target_table.head(len(local_table))  # ensures we are only comparing the newly appended data
+            if 'GLOBALID' in target_table.columns:
+                target_table = target_table.drop('GLOBALID', 1)
+            # self.assertTrue(local_table.equals(target_table.head(len(local_table))))
+            self.assertTrue((local_table == target_table.head(len(local_table))).all().all())
+            target = target_table.drop(range(len(local_table)))  # ensures we are only comparing the newly appended data
 
         for field in xml_fields.keys():
             if method_dict[field] == self.methods["None"]:
-                self.none_test(target[field])
+                self.none_test(target[field], default_values[field])
             elif method_dict[field] == self.methods["Copy"]:
                 self.copy_test(source_table[xml_fields[field]], target[field])
             elif method_dict[field] == self.methods["Set Value"]:
@@ -344,21 +358,23 @@ class UnitTests(unittest.TestCase):
             else:
                 self.assertIn(method_dict[field], self.methods)
 
-    def none_test(self, target: pd.Series):
+    def none_test(self, target: pd.Series, defaultValue):
         """
         Ensures that the vector is a vector of none
-        # :param target:
+        :param target:
+        :param defaultValue:
         :return:
         """
         # TODO: Look into this, might be a bug where none method in string fields is 'None' not <Null>
-        self.assertTrue(len(target.unique()) == 1 and (target.unique()[0] is None or target.unique()[0] == 'None'),
+        self.assertTrue(len(target.unique()) == 1 and (
+            target.unique()[0] is None or target.unique()[0] == 'None' or target.unique()[0] == defaultValue),
                         target.to_string())
 
     def copy_test(self, source: pd.Series, target: pd.Series):
         """
          Ensures that the copy source got copied to the target. In other words, ensures that the two vectors are equal.
         """
-        self.assertTrue(source.equals(target.astype(source.dtype)),
+        self.assertTrue((source == target.astype(source.dtype)).all(),
                         "Mis-match bewteen these fields: " + source.name + " " + target.name)
 
     def set_value_test(self, target: pd.Series, value: pd.Series):
@@ -429,7 +445,7 @@ class UnitTests(unittest.TestCase):
         :param number: int
         :return:
         """
-        self.assertTrue((source.map(lambda x: str(x)[:number]) == target).all())
+        self.assertTrue((source.astype(str).apply(lambda f: f[:number]) == target.astype(str)).all())
 
     def right_test(self, source: pd.Series, target: pd.Series, number: int):
         """
@@ -439,7 +455,7 @@ class UnitTests(unittest.TestCase):
         :param number:
         :return:
         """
-        self.assertTrue((source.str[:-number] == target).all())
+        self.assertTrue((source.astype(str).apply(lambda f: f[:-number]) == target.astype(str)).all())
 
     def substring_test(self, source: pd.Series, target: pd.Series, start: int, length: int):
         """
@@ -450,7 +466,7 @@ class UnitTests(unittest.TestCase):
         :param length:
         :return:
         """
-        self.assertTrue((source.str[start:length + start] == target).all())
+        self.assertTrue((source.astype(str).apply(lambda f: f[start:length + start]) == target.astype(str)).all())
 
     def split_test(self, source: pd.Series, target: pd.Series, split_point: str, part: int):
         """
@@ -461,7 +477,6 @@ class UnitTests(unittest.TestCase):
         :param part:
         :return:
         """
-        print(target)
         for sfield, tfield in zip(source, target):
             self.assertTrue(sfield.split(split_point)[part] == tfield)
 
@@ -536,8 +551,8 @@ class UnitTests(unittest.TestCase):
             return
         else:
             self.test_create()
-            self.test_fields()
             self.test_length()
+            self.test_fields()
             self.test_data()
 
 
@@ -766,6 +781,7 @@ def change_xml_path(t_workspace: list):
                 field.text = os.path.join(workspace["Target"], workspace["TargetName"])
         xml.write(workspace["xmlLocation"])
 
+
 if __name__ == '__main__':
     tmp = make_temp_file()
     temp_workspace = change_workspace(_localWorkspace, pathlib.Path(tmp.name).stem)
@@ -781,4 +797,5 @@ if __name__ == '__main__':
         tmp.cleanup()
     except PermissionError:
         print("Unable to delete temporary folder: Permission Error")
-    #restore_data()
+        pass
+        # restore_data()
