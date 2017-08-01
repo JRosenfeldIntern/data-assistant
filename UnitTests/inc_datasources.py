@@ -5,7 +5,7 @@ import pathlib
 _daGPTools = str((pathlib.Path(__file__).parents[1]/"Shared\\GPTools\\arcpy").absolute())
 # location for local output
 _localOutputPath = str(pathlib.Path(__file__).parents[0] / 'testOutput')
-_outputDirectory = str(pathlib.Path(__file__).parents[0] / 'dla.gdb')
+_outputDirectory = os.path.join(_daGPTools, 'dla.gdb')
 
 ########### Source and Target ##########
 # DB Workspaces

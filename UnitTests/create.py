@@ -6,7 +6,7 @@ import dlaPreview
 import dlaPublish
 import dlaStage
 import test_All
-from inc_datasources import _outputDirectory
+from inc_datasources import _outputDirectory, _daGPTools
 
 
 class BaseClass(object):
@@ -72,7 +72,7 @@ class CreateConfig(BaseClass):
         """
         source_path = os.path.join(self.local_workspace["Source"], self.local_workspace["SourceName"])
         target_path = os.path.join(self.local_workspace["Target"], self.local_workspace["TargetName"])
-        field_matcher = os.path.dirname(os.path.realpath(__file__))
+        field_matcher = _daGPTools
         shutil.copy(self.local_workspace["MatchLibrary"], field_matcher)
         return dlaCreateSourceTarget.createDlaFile(source_path, target_path, self.local_workspace["outXML"])
 

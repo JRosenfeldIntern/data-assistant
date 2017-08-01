@@ -75,6 +75,9 @@ def xml_compare(x1: ET, x2: ET, reporter=None):
     :param reporter:
     :return:
     """
+    if x1.tag in ['Source', 'Target'] or x2.tag in ['Source', 'Target']:
+        # We skip asserting the data path is correct because our xml file data paths may not match
+        return True
     if x1.tag != x2.tag:
         if reporter:
             reporter('Tags do not match: %s and %s' % (x1.tag, x2.tag))
@@ -758,9 +761,9 @@ def change_xml_path(t_workspace: list):
         datasets = root.find('Datasets').getchildren()
         for field in datasets:
             if field.tag == "Source":
-                field.text = workspace["Source"]
+                field.text = os.path.join(workspace["Source"], workspace["SourceName"])
             if field.tag == "Target":
-                field.text = workspace["Target"]
+                field.text = os.path.join(workspace["Target"], workspace["TargetName"])
         xml.write(workspace["xmlLocation"])
 
 if __name__ == '__main__':
@@ -768,11 +771,14 @@ if __name__ == '__main__':
     temp_workspace = change_workspace(_localWorkspace, pathlib.Path(tmp.name).stem)
     set_up_data(tmp.name)
     change_xml_path(temp_workspace)
-
     for local_workspace in temp_workspace:
-        # UnitTests(CreateConfig(local_workspace)).main()
+        UnitTests(CreateConfig(local_workspace)).main()
         UnitTests(Preview(local_workspace)).main()
-        # UnitTests(create.Stage(local_workspace)).main()
-        # UnitTests(Append(local_workspace)).main()
+        UnitTests(Append(local_workspace)).main()
+        UnitTests(Stage(local_workspace)).main()
 
+    try:
+        tmp.cleanup()
+    except PermissionError:
+        print("Unable to delete temporary folder: Permission Error")
     #restore_data()

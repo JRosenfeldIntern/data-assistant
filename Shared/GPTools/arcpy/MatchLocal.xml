@@ -1,19 +1,68 @@
-<?xml version="1.0"?>
-<SourceTargetMatch version="1.1" xmlns:esri="http://www.esri.com">
-  <!--
-| Copyright 2016 Esri
-|
-| Licensed under the Apache License, Version 2.0 (the "License");
-| you may not use this file except in compliance with the License.
-| You may obtain a copy of the License at
-|
-|    http://www.apache.org/licenses/LICENSE-2.0
-|
-| Unless required by applicable law or agreed to in writing, software
-| distributed under the License is distributed on an "AS IS" BASIS,
-| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-| See the License for the specific language governing permissions and
-| limitations under the License.
--->
-  <Fields/>
+<?xml version="1.0" encoding="utf-8"?>
+<SourceTargetMatch xmlns:esri="http://esri.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--C:\Users\josh9173\Documents\ArcGIS\Projects\MyProject1\SourceTarget.xml has field count = 11-->
+  <!--match file field count = 0-->
+  <!--Looking for fields in new xmlDoc that are not in match list-->
+  <Field count="1">
+    <SourceName>DIAMETER</SourceName>
+    <TargetName>ASSETGROUP</TargetName>
+    <Method>Right</Method>
+    <Right>1</Right>
+  </Field>
+  <Field count="1">
+    <SourceName>OWNEDBY</SourceName>
+    <TargetName>ASSETTYPE</TargetName>
+    <Method>ValueMap</Method>
+    <ValueMap>
+      <Otherwise>Esri</Otherwise>
+    </ValueMap>
+  </Field>
+  <Field count="1">
+    <SourceName>(None)</SourceName>
+    <TargetName>CONTAINMENTSTATUS</TargetName>
+    <Method>None</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>FACILITYID</SourceName>
+    <TargetName>SUBNETWORKNAME</TargetName>
+    <Method>Left</Method>
+    <Left>2</Left>
+  </Field>
+  <Field count="1">
+    <SourceName>LASTUPDATE</SourceName>
+    <TargetName>CREATIONDATE</TargetName>
+    <Method>Copy</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>LASTEDITOR</SourceName>
+    <TargetName>CREATOR</TargetName>
+    <Method>Copy</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>LASTUPDATE</SourceName>
+    <TargetName>LASTUPDATE</TargetName>
+    <Method>Copy</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>(None)</SourceName>
+    <TargetName>UPDATEDBY</TargetName>
+    <Method>None</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>MATERIAL</SourceName>
+    <TargetName>material</TargetName>
+    <Method>Copy</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>(None)</SourceName>
+    <TargetName>measuredlength</TargetName>
+    <Method>None</Method>
+  </Field>
+  <Field count="1">
+    <SourceName>(None)</SourceName>
+    <TargetName>assetid</TargetName>
+    <Method>None</Method>
+  </Field>
+  <!--Looking for fields in new xmlDoc that are already in the match list-->
+  <!--0unique fields-->
 </SourceTargetMatch>
