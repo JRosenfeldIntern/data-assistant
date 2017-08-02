@@ -372,7 +372,7 @@ class UnitTests(unittest.TestCase):
         """
          Ensures that the copy source got copied to the target. In other words, ensures that the two vectors are equal.
         """
-        self.assertFalse((source == target.astype(source.dtype)).all(),
+        self.assertTrue((source == target.astype(source.dtype)).all(),
                         "Mis-match bewteen these fields: " + source.name + " " + target.name)
 
     def set_value_test(self, target: pd.Series, value: pd.Series):
@@ -816,7 +816,6 @@ if __name__ == '__main__':
             UnitTests(Replace(local_workspace)).main()
     except AssertionError as e:
         traceback.print_exc()
-        sys.exit(-1)
     finally:
         try:
             tmp.cleanup()
