@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
+import traceback
 
 sys.path.insert(0, _daGPTools)
 import arcpy
@@ -176,7 +177,7 @@ class UnitTests(unittest.TestCase):
         Once the feature class being tested is created, sets the datapath and fields of that feature class
         :return:
         """
-        arcpy.env.workspace = self.localDirectory  # TODO: Workaround for create_config
+        arcpy.env.workspace = self.localDirectory
         self.localFC = arcpy.ListFeatureClasses()[0]
         arcpy.env.workspace = ""
         self.localDataPath = os.path.join(_outputDirectory, self.localFC)
@@ -305,7 +306,7 @@ class UnitTests(unittest.TestCase):
             target = local_table
         else:
             if 'GLOBALID' in target_table.columns:
-                target_table = target_table.drop('GLOBALID', 1)
+                target_table = target_table.drop('GLOBALID', 1)  # TODO: Might need to omit other itrations of globalid
             # self.assertTrue(local_table.equals(target_table.head(len(local_table))))
             self.assertTrue((local_table == target_table.head(len(local_table))).all().all())
             target = target_table.drop(range(len(local_table)))  # ensures we are only comparing the newly appended data
@@ -772,7 +773,7 @@ def change_xml_path(t_workspace: list):
     :param t_workspace:
     :return:
     """
-    for workspace in t_workspace:  # TODO: Actually change the xml, not the ET representing the xml
+    for workspace in t_workspace:
         xml = ET.parse(workspace["xmlLocation"])
         root = xml.getroot()
         datasets = root.find('Datasets').getchildren()
@@ -793,14 +794,12 @@ if __name__ == '__main__':
         for local_workspace in temp_workspace:
             UnitTests(CreateConfig(local_workspace)).main()
             UnitTests(Preview(local_workspace)).main()
-            append = UnitTests(Append(local_workspace))
-            append.destage()
-            append.main()
+            UnitTests(Append(local_workspace)).main()
             stage = UnitTests(Stage(local_workspace))
             stage.main()
             stage.destage()
     except AssertionError as e:
-        print(e)
+        print("**ASSERTION ERROR:", e, "**")
     finally:
         try:
             tmp.cleanup()
