@@ -1,3 +1,4 @@
+import traceback
 import functools
 import pathlib
 import sys
@@ -6,7 +7,6 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 from inc_datasources import _XMLMethodNames, _localWorkspace, _outputDirectory, _daGPTools
-import traceback
 
 sys.path.insert(0, _daGPTools)
 import arcpy
@@ -260,28 +260,39 @@ class UnitTests(unittest.TestCase):
         Ensures the correct rows were appended and removed and in the correct order
         :return:
         """
-        if self.testObject.title != "Replace":
-            return
         replaced_rows_list = []
-        copy = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.localFields])).iterrows()
-        target = self.build_data_frame(self.targetDataPath,
-                                       tuple([field.name for field in self.targetFields])).iterrows()
+        targetfields = list()
+        for field in self.targetFields:
+            if field.name not in ['GLOBALID', 'OBJECTID']:  # TODO: might need to check other forms of globalid here
+                targetfields.append(field.name)
+        localfields = list()
+        for field in self.localFields:
+            if field.name != 'OBJECTID':
+                localfields.append(field.name)
+
+        copy = self.build_data_frame(self.localDataPath, tuple(localfields)).iterrows()
+        target = self.build_data_frame(self.targetDataPath, tuple(targetfields)).iterrows()
         replace_dict = self.get_xml_parse().parse_replace()
         for copy_row, targetRow in zip(copy, target):  # will iterate through until all of the copy cursor is exhausted
-            while targetRow != copy_row:
-                if replace_dict["Operator"] == "=":
-                    self.assertEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
-                if replace_dict["Operator"] == "!=":
-                    self.assertNotEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
-                if replace_dict["Operator"] == "Like":
-                    self.assertIn(replace_dict["Value"], targetRow[replace_dict["FieldName"]])
+            copy_row = copy_row[1]
+            targetRow = targetRow[1]
+            while not targetRow.equals(copy_row):
                 replaced_rows_list.append(copy_row)
-                copy_row = copy.next()
+                copy_row = next(copy)
+                copy_row = copy_row[1]
 
-        for targetRow, copy_row in zip(target,
-                                       replaced_rows_list):  # now iterates through the rows that should have been
-            self.assertEqual(targetRow,
-                             copy_row)  # appended to ensure order and accuracy. Here the target cursor starts
+        for targetRow, copy_row in zip(target, replaced_rows_list):
+            # now iterates through the rows that should have been
+            targetRow = targetRow[1]
+            #  these assertions make sure the targetRow SHOULD have been replaced
+            if replace_dict["Operator"] == "=":
+                self.assertEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
+            if replace_dict["Operator"] == "!=":
+                self.assertNotEqual(targetRow[replace_dict["FieldName"]], replace_dict["Value"])
+            if replace_dict["Operator"] == "Like":
+                self.assertIn(replace_dict["Value"], targetRow[replace_dict["FieldName"]])
+            self.assertTrue(targetRow.equals(copy_row))
+            # appended to ensure order and accuracy. Here the target cursor starts
             # at where the beginning of the re-appended rows should be
 
     def test_data(self):
@@ -290,8 +301,6 @@ class UnitTests(unittest.TestCase):
         performed correctly
         :return:
         """
-        if self.testObject.title not in ["Preview", "Stage", "Append"]:
-            return
         source_table = self.build_data_frame(self.sourceDataPath, tuple([field.name for field in self.sourceFields]))
         local_table = self.build_data_frame(self.localDataPath, tuple([field.name for field in self.localFields]))
         target_table = self.build_data_frame(self.targetDataPath, tuple([field.name for field in self.targetFields]))
@@ -556,7 +565,10 @@ class UnitTests(unittest.TestCase):
             self.test_create()
             self.test_length()
             self.test_fields()
-            self.test_data()
+            if self.testObject.title == 'Replace':
+                self.test_replace_data()
+            else:
+                self.test_data()
 
 
 class SourceTargetParser(object):
@@ -639,7 +651,10 @@ class SourceTargetParser(object):
         Returns a dictionary with the information used by Replace By Field Value
         :return: dict
         """
-        replace_by = self.xml.find('ReplaceBy')
+        datasets = self.xml.find('Datasets')
+        replace_by = datasets.find('ReplaceBy')
+        if len(replace_by.getchildren()) == 0:
+            raise (AssertionError("ReplaceBy is empty in the XML"))
         outdict = dict()
         outdict["FieldName"] = replace_by.find('FieldName').text
         outdict['Operator'] = replace_by.find('Operator').text
@@ -794,12 +809,13 @@ if __name__ == '__main__':
         for local_workspace in temp_workspace:
             UnitTests(CreateConfig(local_workspace)).main()
             UnitTests(Preview(local_workspace)).main()
-            UnitTests(Append(local_workspace)).main()
             stage = UnitTests(Stage(local_workspace))
             stage.main()
             stage.destage()
+            UnitTests(Append(local_workspace)).main()
+            UnitTests(Replace(local_workspace)).main()
     except AssertionError as e:
-        print("**ASSERTION ERROR:", e, "**")
+        traceback.print_exc()
     finally:
         try:
             tmp.cleanup()
