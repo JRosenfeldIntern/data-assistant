@@ -525,6 +525,10 @@ class UnitTests(unittest.TestCase):
         """
         for s, t in zip(source, target):
             if s in mappings:
+                if mappings[s] == "(None)":
+                    # In the event that a is loaded in the xml but not mapped to any target domain, we want to
+                    # make sure that the source and target values are the same
+                    self.assertEqual(s, t)
                 self.assertEqual(mappings[s], t)
 
     def test_xml(self):
