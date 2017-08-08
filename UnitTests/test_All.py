@@ -25,8 +25,9 @@ def clear_feature_classes(directory: str):
     """
     arcpy.env.workspace = directory
     featureclasses = arcpy.ListFeatureClasses()
-    for featureclass in featureclasses:
-        arcpy.Delete_management(os.path.join(directory, featureclass))
+    if featureclasses is not None:
+        for featureclass in featureclasses:
+            arcpy.Delete_management(os.path.join(directory, featureclass))
 
 
 def build_correct_fields(xml_location: str, include_globalid: bool = False):
