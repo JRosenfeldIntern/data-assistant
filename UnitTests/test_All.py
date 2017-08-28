@@ -398,9 +398,9 @@ class UnitTests(unittest.TestCase):
         """
         for s, t in zip(source, target):
             if s in value_dict:
-                self.assertTrue(t == value_dict[s])
+                self.assertTrue(str(t) == str(value_dict[s]), str(t) + " != " + str(value_dict[s]))
             else:
-                self.assertTrue(t == otherwise)
+                self.assertTrue(str(t) == str(otherwise))
 
     def change_case_test(self, source: pd.Series, target: pd.Series, manipulation: str):
         """
@@ -434,8 +434,9 @@ class UnitTests(unittest.TestCase):
         if seperator == "(space)":
             seperator = " "
         compare_column = source_table[cfields.pop(0)]
-        for cifeld in cfields:
-            compare_column = compare_column.astype(str).str.cat(source_table[cifeld].astype(str), sep=seperator)
+        for cfield in cfields:
+            right = source_table[cfield].replace("NaN", "").astype(str)
+            compare_column = compare_column.astype(str).str.cat(right, sep=seperator)
         self.assertTrue((target == compare_column).all())
 
     def left_test(self, source: pd.Series, target: pd.Series, number: int):

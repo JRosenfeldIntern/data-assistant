@@ -262,7 +262,7 @@
         ],
         "dataConnection" : {
           "type" : "CIMStandardDataConnection",
-          "workspaceConnectionString" : "DATABASE=..\\..\\localData\\tmp223xa06d\\WaterDataMigration.gdb",
+          "workspaceConnectionString" : "DATABASE=..\\..\\localData\\tmpmsqrkqqf\\WaterDataMigration.gdb",
           "workspaceFactory" : "FileGDB",
           "dataset" : "Target",
           "datasetType" : "esriDTFeatureClass"
@@ -343,9 +343,9 @@
                         "color" : {
                           "type" : "CIMHSVColor",
                           "values" : [
-                            183.4739990234375,
-                            18.340000152587891,
-                            99.209999084472656,
+                            95.082000732421875,
+                            26.139999389648438,
+                            99.419998168945313,
                             100
                           ]
                         }
@@ -383,9 +383,9 @@
                         "color" : {
                           "type" : "CIMHSVColor",
                           "values" : [
-                            186.91799926757813,
-                            23.770000457763672,
-                            99.94000244140625,
+                            350.51998901367188,
+                            28.879999160766602,
+                            99.339996337890625,
                             100
                           ]
                         }
