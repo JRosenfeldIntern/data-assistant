@@ -1,7 +1,7 @@
-import traceback
 import functools
 import pathlib
 import sys
+import traceback
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
@@ -12,7 +12,7 @@ sys.path.insert(0, _daGPTools)
 import arcpy
 import pandas as pd
 import tempfile
-import dla
+from scripts import dla
 from create import *
 
 
@@ -149,10 +149,11 @@ class UnitTests(unittest.TestCase):
         self.targetFields = tuple(arcpy.ListFields(self.targetDataPath))
         self.methods = _XMLMethodNames
         self.xmlLocation = self.local_workspace["xmlLocation"]
-        self.outXML = self.local_workspace["outXML"]
+        self.outXML = os.path.join(str(pathlib.Path(self.local_workspace["outXML"]).parent),
+                                   pathlib.Path(self.local_workspace["outXML"]).stem,
+                                   os.path.basename(self.local_workspace["outXML"]))
         self.correctXML = self.local_workspace["correctXML"]
 
-    # TODO: We want this function to run first, but unit tests should be monolithic. Might need to have a workaround
     def test_create(self):
         """
         Creates the feature class or xml file for testing
@@ -264,11 +265,11 @@ class UnitTests(unittest.TestCase):
         replaced_rows_list = []
         targetfields = list()
         for field in self.targetFields:
-            if field.name not in ['GLOBALID', 'OBJECTID']:  # TODO: might need to check other forms of globalid here
+            if field.name.lower() not in ['globalid', 'objectid']:
                 targetfields.append(field.name)
         localfields = list()
         for field in self.localFields:
-            if field.name != 'OBJECTID':
+            if field.name.lower() not in ['globalid', 'objectid']:
                 localfields.append(field.name)
 
         copy = self.build_data_frame(self.localDataPath, tuple(localfields)).iterrows()
@@ -317,6 +318,8 @@ class UnitTests(unittest.TestCase):
         else:
             if 'GLOBALID' in target_table.columns:
                 target_table = target_table.drop('GLOBALID', 1)  # TODO: Might need to omit other itrations of globalid
+            if 'GLOBALID' in local_table.columns:
+                local_table = local_table.drop('GLOBALID', 1)  # TODO: Might need to omit other itrations of globalid
             # self.assertTrue(local_table.equals(target_table.head(len(local_table))))
             self.assertTrue((local_table == target_table.head(len(local_table))).all().all())
             target = target_table.drop(range(len(local_table)))  # ensures we are only comparing the newly appended data
@@ -364,7 +367,6 @@ class UnitTests(unittest.TestCase):
         :param defaultValue:
         :return:
         """
-        # TODO: Look into this, might be a bug where none method in string fields is 'None' not <Null>
         self.assertTrue(len(target.unique()) == 1 and (
             target.unique()[0] is None or target.unique()[0] == 'None' or target.unique()[0] == defaultValue),
                         target.to_string())

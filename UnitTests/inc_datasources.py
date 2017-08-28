@@ -2,10 +2,10 @@ import os
 import pathlib
 
 # Path to Data Assistant tools
-_daGPTools = str((pathlib.Path(__file__).parents[1]/"Shared\\GPTools\\arcpy").absolute())
+_daGPTools = str((pathlib.Path(__file__).parents[1] / "Shared\\GPTools\\pyt").absolute())
 # location for local output
 _localOutputPath = str(pathlib.Path(__file__).parents[0] / 'testOutput')
-_outputDirectory = os.path.join(_daGPTools, 'dla.gdb')
+_outputDirectory = os.path.join(_daGPTools, 'scripts', 'dla.gdb')
 
 ########### Source and Target ##########
 # DB Workspaces
@@ -20,13 +20,7 @@ _localWorkspace.append(
      "outXML": os.path.join(_localOutputPath, "test_GDB.xml"),
      "correctXML": str(pathlib.Path(r".\testOutput\correctXML\GDB\correct_GDB.xml").absolute()),
      "MatchLibrary": str(pathlib.Path(r".\testOutput\correctXML\GDB\MatchLocal.xml").absolute())
-     })  # might not need
-# _localWorkspace.append({"Source":str(pathlib.Path(".\localData").absolute()),
-#                       "Target":str(pathlib.Path(".\localData").absolute()),
-#                        "SourceName":"source.lyrx",
-#                        "TargetName":"Target.lyrx"})
-
-
+     })
 
 ########## XML Syntax ############
 # XML Method Names. Change these if XML formatting ever changes

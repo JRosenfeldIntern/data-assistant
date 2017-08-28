@@ -1,12 +1,10 @@
 import os
 import shutil
-
-import dlaCreateSourceTarget
-import dlaPreview
-import dlaPublish
-import dlaStage
-import test_All
+import sys
 from inc_datasources import _outputDirectory, _daGPTools
+sys.path.insert(0, _daGPTools)
+from scripts import dlaCreateSourceTarget, dlaPreview, dlaPublish, dlaStage
+import test_All
 
 
 class BaseClass(object):
@@ -72,7 +70,7 @@ class CreateConfig(BaseClass):
         """
         source_path = os.path.join(self.local_workspace["Source"], self.local_workspace["SourceName"])
         target_path = os.path.join(self.local_workspace["Target"], self.local_workspace["TargetName"])
-        field_matcher = _daGPTools
+        field_matcher = os.path.join(_daGPTools,"scripts")
         shutil.copy(self.local_workspace["MatchLibrary"], field_matcher)
         return dlaCreateSourceTarget.createDlaFile(source_path, target_path, self.local_workspace["outXML"])
 
@@ -91,8 +89,7 @@ class Preview(BaseClass):
         Creates a preview feature class in dla.gdb for testing
         :return: None or False
         """
-        dlaPreview.rowLimit = self.RowLimit
-        return dlaPreview.preview(self.xmlLocation)  # creates the new feature class
+        return dlaPreview.preview(self.xmlLocation, False, self.RowLimit)  # creates the new feature class
 
 
 class Stage(BaseClass):
@@ -108,7 +105,7 @@ class Stage(BaseClass):
         Creates a staged version of the code in a feature class in dla.gdb for testing
         :return: None or False
         """
-        return dlaStage.stage(self.xmlLocation)  # creates the new feature class
+        return dlaStage.stage(self.xmlLocation, False)  # creates the new feature class
 
 
 class Append(BaseClass):
@@ -128,7 +125,7 @@ class Append(BaseClass):
         """
         test_All.make_copy(self.directory, self.local_workspace)
         dlaPublish._useReplaceSettings = False
-        return dlaPublish.publish(self.xmlLocation)
+        return dlaPublish.publish(self.xmlLocation, False, False)
 
 
 class Replace(BaseClass):
@@ -147,4 +144,4 @@ class Replace(BaseClass):
         """
         test_All.make_copy(self.directory, self.local_workspace)
         dlaPublish._useReplaceSettings = True
-        return dlaPublish.publish(self.xmlLocation)
+        return dlaPublish.publish(self.xmlLocation, False, True)
