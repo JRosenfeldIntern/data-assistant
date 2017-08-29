@@ -102,14 +102,14 @@ class DAbase(object):
                 validator.validate()
                 if validator.source_error is not None:
                     if validator.source_error.severity == "ERROR":
-                        parameters[0].setErrorMessage("xml " + str(i+1)+":"+validator.source_error.message)
+                        parameters[0].setErrorMessage("xml " + str(i + 1) + ":" + validator.source_error.message)
                     else:
-                        parameters[0].setWarningMessage("xml " + str(i+1)+":"+validator.source_error.message)
+                        parameters[0].setWarningMessage("xml " + str(i + 1) + ":" + validator.source_error.message)
                 elif validator.target_error is not None:
                     if validator.target_error.severity == "ERROR":
-                        parameters[0].setErrorMessage("xml " + str(i+1)+":"+validator.target_error.message)
+                        parameters[0].setErrorMessage("xml " + str(i + 1) + ":" + validator.target_error.message)
                     else:
-                        parameters[0].setWarningMessage("xml " + str(i+1)+":"+validator.target_error.message)
+                        parameters[0].setWarningMessage("xml " + str(i + 1) + ":" + validator.target_error.message)
         else:
             params = [ParamWrapper(p).getValues() for p in parameters]
             source, target, xml = params

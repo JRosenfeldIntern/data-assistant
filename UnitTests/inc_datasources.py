@@ -15,7 +15,6 @@ _localWorkspace.append(
      "Target": str(pathlib.Path(".\localData\WaterDataMigration.gdb").absolute()),
      "SourceName": "source",
      "TargetName": "Target",
-     "OriginalPath": str(pathlib.Path(".\localData\Originals\WaterDataMigration.gdb\Target").absolute()),
      "xmlLocation": os.path.join(_localOutputPath, "GDB_to_GDB.xml"),
      "outXML": os.path.join(_localOutputPath, "test_GDB.xml"),
      "correctXML": str(pathlib.Path(r".\testOutput\correctXML\GDB\correct_GDB.xml").absolute()),
