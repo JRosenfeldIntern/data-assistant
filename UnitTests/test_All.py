@@ -822,8 +822,7 @@ if __name__ == '__main__':
             stage.destage()
             UnitTests(Append(local_workspace)).main()
             UnitTests(Replace(local_workspace)).main()
-            etur5u
-    except AssertionError as e:
+    except:
         traceback.print_exc()
         sys.exit(-1)
     finally:
