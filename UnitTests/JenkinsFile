@@ -1,0 +1,12 @@
+#!/usr/bin/env groovy
+pipeline{
+	agent any
+	stages{
+		stage('Example'){
+			steps{
+				echo 'Hello world'
+				bat 'python ./test_All.py'
+			}
+		}
+	}
+}
