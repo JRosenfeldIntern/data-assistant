@@ -6,7 +6,7 @@ pipeline{
 			steps{
 				echo 'Hello world'
 				bat 'cd UnitTests'
-				bat 'python './test_All.py'
+				bat 'python ./test_All.py'
 			}
 		}
 	}
