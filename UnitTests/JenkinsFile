@@ -4,7 +4,7 @@ pipeline{
 	stages{
 		stage('Tests'){
 			steps{
-				bat 'UnitTests\runtest'
+				bat 'UnitTests\\runtest'
 			}
 		}
 	}
