@@ -2,9 +2,29 @@
 pipeline{
 	agent any
 	stages{
-		stage('Tests'){
+		stage('CreateFile'){
 			steps{
-				bat 'UnitTests\\runtest'
+				bat 'UnitTests\\RunCreateTest'
+			}
+		}
+		stage('Preview'){
+			steps{
+				bat 'UnitTests\\RunPreviewTest'
+			}
+		}
+		stage('Stage'){
+			steps{
+				bat 'UnitTests\\RunStageTest'
+			}
+		}
+		stage('Append'){
+			steps{
+				bat 'UnitTests\\RunAppendTest'
+			}
+		}
+		stage('Replace'){
+			steps{
+				bat 'UnitTests\\RunReplaceTest'
 			}
 		}
 	}
