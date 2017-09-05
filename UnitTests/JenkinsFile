@@ -17,14 +17,9 @@ pipeline{
 				bat 'UnitTests\\RunStageTest'
 			}
 		}
-		stage('Append'){
+		stage('Append//Replace'){
 			steps{
 				bat 'UnitTests\\RunAppendTest'
-			}
-		}
-		stage('Replace'){
-			steps{
-				bat 'UnitTests\\RunReplaceTest'
 			}
 		}
 	}

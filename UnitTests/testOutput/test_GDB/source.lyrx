@@ -229,7 +229,7 @@
         ],
         "dataConnection" : {
           "type" : "CIMStandardDataConnection",
-          "workspaceConnectionString" : "DATABASE=..\\..\\localData\\tmpsk57zik5\\WaterDataMigration.gdb",
+          "workspaceConnectionString" : "DATABASE=..\\..\\localData\\tmp_5mqophu\\WaterDataMigration.gdb",
           "workspaceFactory" : "FileGDB",
           "dataset" : "source",
           "datasetType" : "esriDTFeatureClass"
@@ -260,8 +260,8 @@
                   "type" : "CIMRGBColor",
                   "values" : [
                     0,
-                    23.381322860717773,
-                    140.2490234375,
+                    158.10116577148438,
+                    13.171206474304199,
                     100
                   ]
                 }

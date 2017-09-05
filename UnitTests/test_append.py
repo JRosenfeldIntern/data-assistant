@@ -816,6 +816,7 @@ if __name__ == '__main__':
     try:
         for local_workspace in temp_workspace:
             UnitTests(Append(local_workspace)).main()
+            UnitTests(Replace(local_workspace)).main()
     except:
         traceback.print_exc()
         sys.exit(-1)
