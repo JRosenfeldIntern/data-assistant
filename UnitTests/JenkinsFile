@@ -5,7 +5,8 @@ pipeline{
 		stage('Example'){
 			steps{
 				echo 'Hello world'
-				bat 'python ./UnitTests/test_All.py'
+				bat 'cd UnitTests'
+				bat 'python './test_All.py'
 			}
 		}
 	}
