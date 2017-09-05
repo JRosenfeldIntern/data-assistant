@@ -2,10 +2,9 @@
 pipeline{
 	agent any
 	stages{
-		stage('Example'){
+		stage('Tests'){
 			steps{
-				echo 'Hello world'
-				bat 'runtest'
+				bat 'UnitTests\runtest'
 			}
 		}
 	}
